@@ -1,0 +1,1339 @@
+---
+format: 
+  html:
+    toc: true
+    code-fold: true
+editor_options: 
+  chunk_output_type: console
+crossref:
+  custom:
+    - kind: float
+      key: suppfig
+      latex-env: suppfig
+      reference-prefix: Figure S
+      space-before-numbering: false
+      latex-list-of-description: Supplementary Figure
+---
+
+```{r setup}
+#| echo: false
+#| message: false
+#| warning: false
+
+fig_width = 10
+fig_height = 4
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.path = "figures/",
+  fig.width = fig_width,
+  fig.height = fig_height,
+  fig.align = "center",
+  dpi = 300
+)
+
+dir.create("data-raw")
+dir.create("data-derived")
+dir.create("figures")
+
+install.packages("pak")
+pak::pak(c("magrittr",
+           "tidyverse",
+           "fs",
+           "sf",
+           "terra",
+           "paletteer",
+           "tidyterra",
+           "sbtools",
+           "exactextractr",
+           "openxlsx",
+           "village-ecodynamics/villager",
+           "slider",
+           "lightgbm",
+           "furrr",
+           "ragg"))
+
+library(magrittr)
+library(tidyverse)
+library(sf)
+library(terra)
+library(openxlsx)
+library(slider)
+library(lightgbm)
+library(furrr)
+library(tidyterra)
+library(sbtools)
+
+terra::terraOptions(memfrac = 0.9, memmin = 32)
+
+openxlsx_setOp("dateFormat", "yyyy-mm-dd")
+openxlsx_setOp("tableStyle", "TableStyleLight1")
+openxlsx_setOp("numFmt", "NUMBER")
+
+Sys.setenv(AWS_NO_SIGN_REQUEST = "YES")
+
+## A function that reads all sheets in an Excel workbook
+read_excel_all <-
+  function(x){
+    readxl::excel_sheets(x) %>%
+      magrittr::set_names(.,.) %>%
+      purrr::map(
+        \(i){
+          readxl::read_excel(x, sheet = i)
+        }
+      )
+  }
+
+
+
+```
+
+[![Last-updated](https://img.shields.io/badge/last%20update-July%202025-brightgreen.svg)](https://github.com/bocinsky/kohler2025)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](http://choosealicense.com/licenses/mit/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bocinsky/kohler2025/main?urlpath=rstudio)
+
+## Research compendium package for Kohler, Brumbaugh, and Bocinsky (2025)
+
+### Overview
+
+This R-based research compendium supports an analysis of climate variability and its impact on ancestral Pueblo agriculture in the Chaco Regional System. It draws on high-resolution paleoclimate reconstructions and spatial regional boundaries to estimate the frequency and duration of agricultural shortfalls over time, and their relationship to the demography of the region.
+
+The project focuses on four archaeological regions and time periods:
+
+- Early Chaco (850–1040 CE)
+- Late Chaco (1040–1150 CE)
+- Post-Chaco (1150–1300 CE)
+- Central Mesa Verde (850–1300 CE)
+
+### Citation
+
+**When using the code included in this research compendium, please cite *all* of the following:**
+
+> Kohler, Timothy A., Laura E. Brumbaugh, and R. Kyle Bocinsky. How Many People lived in the Chaco Regional System, and Why It Matters. In review.
+
+> Kohler, Timothy A., Laura E. Brumbaugh, and R. Kyle Bocinsky. Research compendium for: *How Many People lived in the Chaco Regional System, and Why It Matters*, 2025. Version 1.0.0. Zenodo. https://doi.org/10.5281/zenodo.\*\*\*
+
+## Dryland Maize Farming Niche
+
+```{r regions}
+## This creates a geojson of the VEPIIN study area
+if(!file.exists("data-raw/vepiin.geojson"))
+  c(xmin = 672800, 
+    xmax = 740000, 
+    ymin = 4102000, 
+    ymax = 4170000) %>%
+  sf::st_bbox(crs = 26912) %>%
+  sf::st_as_sfc() %>%
+  sf::st_transform("EPSG:4326") %>%
+  sf::write_sf("data-raw/vepiin.geojson",
+               delete_dsn = TRUE)
+
+chaco_regions <-
+  list(`E CRS (850–1040)` = "data-raw/EarlyChacoRegion_LatLong.geojson",
+       `L CRS (1040–1150)` = "data-raw/LateChacoRegion_LatLong.geojson",
+       `P CRS (1150–1300)` = "data-raw/PostChacoRegion_LatLong.geojson",
+       `VEPIIN (850–1300)` = "data-raw/vepiin.geojson"
+  ) %>%
+  purrr::map_dfr(sf::read_sf, .id = "region") %>%
+  dplyr::select(region) %>%
+  sf::st_transform("EPSG:4269") %>%
+  sf::st_cast("MULTIPOLYGON")
+
+```
+
+```{r plot-map-array}
+# Get state boundaries from the US Census for mapping
+states <- 
+  tigris::states(cb = TRUE,
+                 progress_bar = FALSE) %>%
+  dplyr::filter(NAME %in% c("Colorado","Utah","New Mexico","Arizona"))
+
+# Define a plotting area around the "Chaco Basin"
+chaco_basin <-
+  sf::st_bbox(c(xmin = -110.35,
+                xmax = -106.9, 
+                ymin = 34.1,
+                ymax = 37.8), 
+              crs = "EPSG:4269") %>%
+  sf::st_as_sfc() %>%
+  sf::st_bbox()
+
+# Create a faceting dataset that always includes VEPIIN
+chaco_regions_facet <-
+  chaco_regions %>%
+  dplyr::rename(lyr = region) %>%
+  {
+    dplyr::bind_rows(.,
+                     dplyr::filter(., lyr == "VEPIIN (850–1300)") %>%
+                       # THIS PIPE TYPE MATTERS
+                       tidyr::uncount(3) |>
+                       dplyr::mutate(lyr = dplyr::filter(., lyr != "VEPIIN (850–1300)")$lyr))
+  } %>%
+  dplyr::filter(lyr != "VEPIIN (850–1300)")
+
+# A function that makes a handsome faceted plot
+plot_map_array <-
+  function(x, 
+           filename,
+           limits, 
+           name,
+           facet = TRUE,
+           ...){
+    
+    out <- 
+      (
+        ggplot() + 
+          geom_spatraster(
+            data = x,
+            na.rm = TRUE) +
+          facet_wrap(~lyr) + 
+          paletteer::scale_fill_paletteer_binned(
+            "scico::batlow",
+            # dynamic = TRUE,
+            na.value = "transparent",
+            n.breaks = 10,
+            show.limits = TRUE,
+            limits = limits,
+            name = name,
+            ...) +
+          geom_sf(data = states,
+                  fill = NA, 
+                  color = "white") +
+          {
+            if(facet)
+              geom_sf(data = chaco_regions_facet,
+                      fill = NA,
+                      color = "white")
+          } +
+          theme_void() + 
+          theme(legend.position = "left",
+                legend.justification = 0.5,
+                legend.title = element_text(angle = 90, hjust = 0.5),
+                legend.title.position = "left",
+                legend.key.height = unit(0.15, "npc")) +
+          coord_sf(crs = "EPSG:4269",
+                   xlim = chaco_basin[c("xmin", "xmax")],
+                   ylim = chaco_basin[c("ymin", "ymax")],
+                   expand = TRUE
+          )
+      )
+    
+    return(out)
+  }
+
+```
+
+```{r paleocar-extraction}
+mfn_path <- file.path("data-derived",
+                      "maize_farming_niche.xlsx")
+
+## Download PaleoCAR Maize niche data from Amazon S3.
+mfn_sources <-
+  c(
+    ppt_wateryear = 
+      "https://skope.s3.us-west-2.amazonaws.com/paleocar_v3/ppt_wateryear/prediction_scaled.tif",
+    gdd_maize_maysept = 
+      "https://skope.s3.us-west-2.amazonaws.com/paleocar_v3/gdd_maize_maysept/prediction_scaled.tif") %>%
+  {
+    curl::multi_download(
+      urls = .,
+      destfiles = file.path("data-raw", paste0(names(.), "_swus_paleocar.tif")),
+      resume = TRUE
+    )
+  } %$%
+  destfile %>%
+  fs::path_rel() %>%
+  magrittr::set_names(c("ppt", "gdd")) %>%
+  as.list()
+
+## Calculate the MFN
+if(!file.exists("data-raw/maize_farming_niche_swus_paleocar.tif")){
+  ppt_niche <-
+    terra::rast(mfn_sources$ppt) %T>%
+    terra::set.values() %>%
+    magrittr::is_weakly_greater_than(300)
+  
+  gdd_niche <-
+    terra::rast(mfn_sources$gdd) %T>%
+    terra::set.values() %>%
+    magrittr::is_weakly_greater_than(1000)
+  
+  niche <- 
+    (ppt_niche & gdd_niche) %T>%
+    terra::set.values()
+  
+  niche %T>%
+    terra::writeRaster(
+      filename = "data-raw/maize_farming_niche_swus_paleocar.tif",
+      datatype = "INT2U",
+      overwrite = TRUE,
+      gdal = c("COMPRESS=ZSTD"),
+      memfrac = 0.9
+    )
+  
+  rm(ppt_niche, gdd_niche, niche)
+  gc(); gc()
+}
+
+## Extract the data for each region and calculate the Maize Farming Niche
+if(!file.exists(mfn_path)){
+  niche <-
+    terra::rast(
+      "data-raw/maize_farming_niche_swus_paleocar.tif"
+    ) %T>%
+    terra::set.values()
+  
+  chaco_regions %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(niche = 
+                    list(
+                      niche %>%
+                        terra::crop(geometry, snap = "out") %>%
+                        terra::mask(terra::vect(geometry)) %>%
+                        terra::global(c("mean", "sd"), na.rm = TRUE) %>%
+                        tibble::rownames_to_column("year") %>%
+                        dplyr::mutate(
+                          year = as.integer(year)
+                        )
+                    )
+    ) %$%
+    magrittr::set_names(niche, region) %>%
+    purrr::map(tibble::as_tibble) %T>%
+    openxlsx::write.xlsx(
+      file = mfn_path,
+      asTable = TRUE,
+      colWidths = "auto"
+    )
+}
+
+maize_farming_niche <-
+  mfn_path %>%
+  read_excel_all()
+
+niche <-
+  terra::rast(
+    "data-raw/maize_farming_niche_swus_paleocar.tif"
+  ) %T>%
+  terra::set.values()
+
+niche_periods <- 
+  list(
+    "E CRS (850–1040)" = 850:1040, 
+    "L CRS (1040–1150)" = 1040:1150,
+    "P CRS (1150–1300)" = 1150:1300
+  ) %>%
+  purrr::map(
+    stringr::str_pad,
+    width = 4, 
+    pad = "0"
+  ) %>%
+  purrr::map(\(x){
+    mean(niche[[x]], na.rm= TRUE)
+  }) %>% 
+  terra::rast()
+
+```
+
+```{r fig-2}
+
+chaco_region_colors <-
+  c(paletteer::paletteer_c("scico::batlow", n = 4)[1:3],"black") %>%
+  magrittr::set_names(
+    c(
+      "E CRS (850–1040)",
+      "L CRS (1040–1150)",
+      "P CRS (1150–1300)",
+      "VEPIIN (850–1300)"
+    ))
+
+sliding_lm <-
+  maize_farming_niche %>%
+  dplyr::bind_rows(.id = "region") %>%
+  dplyr::mutate(year = as.integer(year)) %>%
+  dplyr::group_by(region) %>%
+  dplyr::arrange(region, year) %>%
+  dplyr::filter(year %in% 800:1350) %>%
+  dplyr::mutate(
+    model = slider::slide2(.x = year,
+                           .y = mean,
+                           .f = ~lm(.y ~ .x),
+                           .before = 9,
+                           .complete = TRUE),
+    fit = 
+      purrr::map(
+        model, 
+        purrr::possibly(
+          \(x)dplyr::last(predict(x)),
+          as.numeric(NA)
+        )
+      ) %>%
+      unlist(),
+    se.fit = 
+      purrr::map(
+        model, 
+        purrr::possibly(
+          \(x)dplyr::last(predict(x, se.fit = TRUE)$se.fit),
+          as.numeric(NA)
+        )
+      ) %>%
+      unlist(),
+    lower = fit - (1.28 * se.fit),
+    upper = fit + (1.28 * se.fit)
+  ) %>%
+  dplyr::ungroup()
+
+sliding_lm %>%
+  dplyr::filter(
+    (region == "E CRS (850–1040)" & year %in% 850:1040) |
+      (region == "L CRS (1040–1150)" & year %in% 1040:1150) |
+      (region == "P CRS (1150–1300)" & year %in% 1150:1300) |
+      (region == "VEPIIN (850–1300)" & year %in% 850:1300)
+  ) %>%
+  dplyr::mutate(
+    region = 
+      factor(region, 
+             levels = 
+               c(
+                 "E CRS (850–1040)",
+                 "L CRS (1040–1150)",
+                 "P CRS (1150–1300)",
+                 "VEPIIN (850–1300)"
+               ),
+             ordered = TRUE
+      )) %>%
+  ggplot(
+    mapping = 
+      aes(x = year, 
+          y = fit, 
+          ymin = lower,
+          ymax = upper,
+          color = region,
+          fill = region)
+  ) +
+  geom_line(linewidth = 0.6) +
+  geom_ribbon(alpha = 0.3, color = NA) +
+  labs(
+    x = "Year A.D.",
+    y = "P Cells in Dry-Farming Niche (smoothed)",
+    color = "Region",
+    fill = "Region"
+  ) +
+  scale_x_continuous(
+    limits = c(850, 1300),
+    breaks = seq(850, 1300, 50),
+    expand = expansion(0,0)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    expand = expansion(0,0),
+    oob = scales::squish
+  ) +
+  scale_color_manual(
+    values = chaco_region_colors) +
+  scale_fill_manual(
+    values = chaco_region_colors) +
+  theme_minimal()
+
+ggsave("figures/Figure_2.png", 
+       device = ragg::agg_png, 
+       width = fig_width, 
+       height = fig_height,
+       bg = "white",
+       dpi = 600
+       )
+
+```
+
+::: {#suppfig-s2}
+
+```{r Figure_s2}
+
+(
+  plot_map_array(
+    x = niche_periods %>%
+      terra::crop(chaco_basin,
+                  touches = FALSE), 
+    limits = c(0,1), 
+    name = "\nP Years in Dry-Farming Niche",
+    labels = scales::percent
+  ) 
+) %T>%
+  ggsave(plot = .,
+         filename = "figures/Figure_s2.png",
+         device = ragg::agg_png,
+         width = fig_width, 
+         height = fig_height,
+         bg = "white",
+       dpi = 600
+  )
+
+```
+
+Percent of years in the maize dry-farming niche across Chacoan regions during key cultural periods.
+
+:::
+
+## Modeling pre-European Net Primary Productivity
+
+To model pre-European Net Primary Productivity (NPP), we estimated potential landscape productivity in the absence of modern irrigation and disturbance, establishing a baseline for past agricultural suitability. We used MODIS 250m annual NPP data for the years 2002, 2007, 2012, and 2017 (Rollins 2009), along with MIRAD irrigated lands data (Pervez and Brown 2010), Landfire datasets (Biophysical Settings, Existing Vegetation Types, Historical Disturbance; (Nelson et al. 2013; Rollins 2009), and PRISM 800m elevation data. We reprojected and aligned all datasets to a common spatial template based on the 800m PRISM dataset. For model training, we retained irrigated and disturbed pixels, but we excluded them during prediction to simulate pre-European conditions.
+
+```{r npp-data}
+template <- 
+  terra::rast(niche_periods) %>% 
+  terra::rast(nlyr = 1)
+
+## MODIS NPP (250m)
+if(!file.exists("data-derived/modis_npp_swus_paleocar.tif")){
+  get_npp <-
+    function(years = c(2002, 2007, 2012, 2017)){
+      modis_npp_urls <-
+        paste0("http://files.ntsg.umt.edu/data/NTSG_Products/MOD17/MODIS_250/modis-250-npp/modis-250-npp-",years,".tif")
+      
+      destfiles <-
+        file.path("data-raw",
+                  basename(modis_npp_urls))
+      
+      curl::multi_download(
+        urls = paste0("http://files.ntsg.umt.edu/data/NTSG_Products/MOD17/MODIS_250/modis-250-npp/modis-250-npp-",years,".tif"),
+        destfiles = destfiles,
+        resume = TRUE
+      ) %$%
+        destfile %>%
+        purrr::map(terra::rast) %>%
+        purrr::map(\(x)x$annualNPP) %>%
+        terra::rast() %>%
+        magrittr::set_names(paste0(years, " 250m MODIS NPP"))
+    }
+  
+  modis_npp <-
+    get_npp() %>%
+    terra::project(template,
+                   method = "bilinear",
+                   filename = "data-derived/modis_npp_swus_paleocar.tif",
+                   datatype = "INT2U",
+                   overwrite = TRUE,
+                   gdal = c("COMPRESS=ZSTD"),
+                   memfrac = 0.9)
+}
+
+modis_npp <- 
+  terra::rast("data-derived/modis_npp_swus_paleocar.tif")
+
+## Irrigated Lands
+if(!file.exists("data-derived/mirad_irrlands_swus_paleocar.tif")){
+  
+  get_scibase <-
+    function(uri, filename){
+      file <-
+        stringr::str_replace(filename, ".zip", ".tif") %>%
+        stringr::str_replace("m_","_")
+      
+      if(!file.exists(filename)) {
+        uri %>%
+          download.file(destfile = file.path("data-raw", filename))
+      }
+      
+      file.path("/vsizip", 
+                "data-raw",
+                filename,
+                stringr::str_remove(filename, ".zip"),
+                file) %>%
+        terra::rast()
+    }
+  
+  mirad_irrlands <-
+    query_sb_doi("10.5066/P9NA3EO8") %>%
+    purrr::pluck(1, "files") %>%
+    purrr::map(\(x)x[c("title", "name", "downloadUri")]) %>%
+    purrr::list_transpose(simplify = TRUE) %>%
+    tibble::as_tibble() %>%
+    dplyr::filter(stringr::str_detect(title, "250m"),
+                  stringr::str_detect(title, "All", negate = TRUE)) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(
+      rast = list(
+        get_scibase(
+          uri = downloadUri,
+          filename = name
+        )
+      )) %$%
+    {magrittr::set_names(rast, title)} %>%
+    terra::rast() %>%
+    terra::project(template,
+                   method = "max",
+                   filename = "data-derived/mirad_irrlands_swus_paleocar.tif",
+                   datatype = "INT1U",
+                   overwrite = TRUE,
+                   gdal = c("COMPRESS=ZSTD", "NBITS=1"),
+                   memfrac = 0.9)
+}
+
+mirad_irrlands <- 
+  terra::rast("data-derived/mirad_irrlands_swus_paleocar.tif")
+
+# Landfire BPS, Historical Disturbance, and Existing Vegetation Types
+if(c(
+  bps = "data-derived/landfire_bps_swus_paleocar.tif",
+  disturbance = "data-derived/landfire_disturbance_swus_paleocar.tif",
+  evt = "data-derived/landfire_evt_swus_paleocar.tif") %>%
+  file.exists() %>%
+  all() %>%
+  not()){
+  
+  read_and_write_landfire <-
+    function(raster, levels, outfile){
+      if(!file.exists(outfile)){
+        out <-
+          terra::rast(raster) %>%
+          `levels<-`(
+            sf::read_sf(levels) %>%
+              readr::type_convert()
+          ) %>%
+          terra::project(
+            template,
+            method = "mode",
+            filename = outfile,
+            datatype = "INT4U",
+            overwrite = TRUE,
+            gdal = c("COMPRESS=ZSTD"),
+            memfrac = 0.9
+          )
+      }
+      return(outfile)
+    }
+  
+  landfire <-
+    c(
+      bps = "https://www.landfire.gov/data-downloads/US_220/LF2020_BPS_220_CONUS.zip",
+      disturbance = "https://www.landfire.gov/data-downloads/US_Disturbance/LF2023_HDist_240_CONUS.zip",
+      evt = "https://www.landfire.gov/data-downloads/US_240/LF2023_EVT_240_CONUS.zip"
+    ) %>%
+    {
+      tibble::tibble(
+        dataset = names(.),
+        downloads = .
+      )
+    } %>%
+    dplyr::mutate(
+      destfile = file.path("data-raw", basename(downloads)),
+      destfile = 
+        curl::multi_download(
+          urls =
+            downloads,
+          destfile = destfile,
+          resume = TRUE
+        )$destfile
+    ) %>%
+    dplyr::mutate(
+      rastfile = 
+        dplyr::case_match(
+          dataset,
+          "bps" ~ 
+            basename(destfile) %>%
+            stringr::str_replace("_CONUS.zip", ".tif") %>%
+            stringr::str_replace("LF2020", "LC20"),
+          "disturbance" ~ 
+            basename(destfile) %>%
+            stringr::str_replace("_CONUS.zip", ".tif") %>%
+            stringr::str_replace("LF20", "LC") %>%
+            stringr::str_replace("HDist", "HDst"),
+          "evt" ~ 
+            basename(destfile) %>%
+            stringr::str_replace("_CONUS.zip", ".tif") %>%
+            stringr::str_replace("LF20", "LC")
+        ) %>%
+        file.path("/vsizip", destfile,
+                  stringr::str_remove(basename(destfile), ".zip"),
+                  "Tif",
+                  .),
+      levelsfile =
+        dplyr::case_match(
+          dataset,
+          "bps" ~
+            rastfile %>%
+            stringr::str_replace("Tif", "CSV_Data") %>%
+            stringr::str_replace(".tif", ".csv") %>%
+            stringr::str_replace("LC20", "LF20"),
+          "disturbance" ~ 
+            rastfile %>%
+            stringr::str_replace("Tif", "CSV_Data") %>%
+            stringr::str_replace(".tif", ".csv") %>%
+            stringr::str_replace("LC23", "LF23"),
+          "evt" ~ 
+            rastfile %>%
+            stringr::str_replace("Tif", "CSV_Data") %>%
+            stringr::str_replace(".tif", ".csv") %>%
+            stringr::str_replace("LC23", "LF23")
+        )
+      
+    ) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(
+      rast = 
+        read_and_write_landfire(
+          raster = rastfile,
+          levels = levelsfile,
+          outfile = file.path("data-derived", paste0("landfire_", dataset, "_swus_paleocar.tif")))
+    ) %>%
+    dplyr::ungroup()
+  
+}
+
+read_and_recat <-
+  function(x, variable){
+    terra::rast(x) %>%
+      terra::`activeCat<-`(variable) %>%
+      as.data.frame(na.rm=FALSE) %>%
+      tibble::as_tibble() %>%
+      terra::setValues(template, values = .) %>%
+      magrittr::set_names(
+        x %>%
+          basename %>%
+          tools::file_path_sans_ext()
+      )
+    
+  }
+
+landfire <-
+  list(
+    bps = read_and_recat("data-derived/landfire_bps_swus_paleocar.tif",
+                         variable = "BPS_NAME"),
+    
+    evt = read_and_recat("data-derived/landfire_evt_swus_paleocar.tif",
+                         variable = "EVT_NAME"),
+    
+    disturbance = read_and_recat("data-derived/landfire_disturbance_swus_paleocar.tif",
+                                 variable = "DIST_TYPE")
+  ) %>%
+  terra::rast()
+
+
+# Recode missing categories
+landfire$bps %<>%
+  as.data.frame(na.rm=FALSE) %>%
+  tibble::as_tibble() %>%
+  dplyr::mutate(
+    bps = 
+      forcats::fct_recode(
+        bps,
+        `Apacherian-Chihuahuan Semi-Desert Shrub-Steppe` = 
+          "Apacherian-Chihuahuan Semi-Desert Grassland and Steppe",
+        `Apacherian-Chihuahuan Semi-Desert Grassland` = 
+          "Apacherian-Chihuahuan Mesquite Upland Scrub",
+        `Chihuahuan Mixed Desert and Thornscrub` = 
+          "Chihuahuan Mixed Desert and Thorn Scrub",
+        `Chihuahuan Mixed Desert and Thornscrub` = 
+          "Chihuahuan Mixed Desert and Thorn Scrub-Shrubland",
+        `Chihuahuan Mixed Desert and Thornscrub` = 
+          "Chihuahuan Mixed Desert and Thorn Scrub-Steppe",
+        `Chihuahuan-Sonoran Desert Bottomland and Swale Grassland` = 
+          "Chihuahuan-Sonoran Desert Bottomland and Swale Grassland-Alkali Sacaton",
+        `Chihuahuan-Sonoran Desert Bottomland and Swale Grassland` = 
+          "Chihuahuan-Sonoran Desert Bottomland and Swale Grassland-Tobosa Grassland",
+        `Inter-Mountain Basins Aspen-Mixed Conifer Forest and Woodland` = 
+          "Inter-Mountain Basins Aspen-Mixed Conifer Forest and Woodland-High Elevation",
+        `Inter-Mountain Basins Aspen-Mixed Conifer Forest and Woodland` = 
+          "Inter-Mountain Basins Aspen-Mixed Conifer Forest and Woodland-Low Elevation",
+        `Inter-Mountain Basins Big Sagebrush Shrubland` = 
+          "Inter-Mountain Basins Big Sagebrush Shrubland-Basin Big Sagebrush",
+        `Inter-Mountain Basins Big Sagebrush Shrubland` = 
+          "Inter-Mountain Basins Big Sagebrush Shrubland-Semi-Desert",
+        `Inter-Mountain Basins Big Sagebrush Shrubland` = 
+          "Inter-Mountain Basins Big Sagebrush Shrubland-Upland",
+        `Inter-Mountain Basins Big Sagebrush Shrubland` = 
+          "Inter-Mountain Basins Big Sagebrush Shrubland-Wyoming Big Sagebrush",
+        `Inter-Mountain Basins Montane Sagebrush Steppe` = 
+          "Inter-Mountain Basins Montane Sagebrush Steppe-Low Sagebrush",
+        `Inter-Mountain Basins Montane Sagebrush Steppe` = 
+          "Inter-Mountain Basins Montane Sagebrush Steppe-Mountain Big Sagebrush",
+        `Rocky Mountain Gambel Oak-Mixed Montane Shrubland` = 
+          "Rocky Mountain Gambel Oak-Mixed Montane Shrubland -Continuous",
+        `Rocky Mountain Gambel Oak-Mixed Montane Shrubland` = 
+          "Rocky Mountain Gambel Oak-Mixed Montane Shrubland-Patchy",
+        `Rocky Mountain Lower Montane-Foothill Shrubland` = 
+          "Rocky Mountain Lower Montane-Foothill Shrubland-No True Mountain Mahogany",
+        `Rocky Mountain Lower Montane-Foothill Shrubland` = 
+          "Rocky Mountain Lower Montane-Foothill Shrubland-True Mountain Mahogany",
+        `Southern Rocky Mountain Ponderosa Pine Savanna` = 
+          "Southern Rocky Mountain Ponderosa Pine Savanna-North",
+        `Southern Rocky Mountain Ponderosa Pine Woodland` = 
+          "Southern Rocky Mountain Ponderosa Pine Woodland-North",
+        `Southern Rocky Mountain Ponderosa Pine Woodland` = 
+          "Southern Rocky Mountain Ponderosa Pine Woodland-South",
+        `Western Great Plains Closed Depression Wetland` = 
+          "Western Great Plains Depressional Wetland Systems",
+        `Western Great Plains Closed Depression Wetland` = 
+          "Western Great Plains Depressional Wetland Systems-Playa",
+        `Western Great Plains Closed Depression Wetland` = 
+          "Western Great Plains Depressional Wetland Systems-Saline",
+        `Western Great Plains Tallgrass Prairie` = 
+          "Central Tallgrass Prairie",
+        `Inter-Mountain Basins Wash` = 
+          "Inter-Mountain Basins Montane Riparian Systems",
+        `North American Warm Desert Riparian Systems` = 
+          "North American Warm Desert Riparian Systems-Stringers",
+        `North American Glacier and Ice Field` = 
+          "Perennial Ice/Snow",
+        `Northwestern Great Plains-Black Hills Ponderosa Pine Woodland and Savanna` = 
+          "Northwestern Great Plains-Black Hills Ponderosa Pine Woodland and Savanna-Savanna",
+        `Western Great Plains Badlands` = 
+          "Western Great Plains Sparsely Vegetated Systems",
+        `North American Warm Desert Badland` = 
+          "North American Warm Desert Sparsely Vegetated Systems",
+        `Rocky Mountain Alpine-Montane Wet Meadow` =
+          "Northern Rocky Mountain Conifer Swamp",
+        `Barren-Rock/Sand/Clay` =
+          "Inter-Mountain Basins Sparsely Vegetated Systems",
+        `Barren-Rock/Sand/Clay` = 
+          "Rocky Mountain Alpine/Montane Sparsely Vegetated Systems",
+        `Barren-Rock/Sand/Clay` = 
+          "Inter-Mountain Basins Sparsely Vegetated Systems",
+        `Northwestern Great Plains Floodplain Herbaceous` = 
+          "Northwestern Great Plains Canyon",
+        `Southern Rocky Mountain Ponderosa Pine Woodland` = 
+          "Northwestern Great Plains Highland White Spruce Woodland",
+        `Rocky Mountain Lodgepole Pine Forest` = 
+          "Rocky Mountain Poor-Site Lodgepole Pine Forest",
+        `Central Mixedgrass Prairie` = 
+          "Western Great Plains Wooded Draw and Ravine",
+        `Inter-Mountain Basins Big Sagebrush Steppe` = 
+          "Inter-Mountain Basins Big Sagebrush Shrubland"
+      )
+  ) %>%
+  terra::setValues(template, values = .)
+
+landfire$evt %<>%
+  as.data.frame(na.rm=FALSE) %>%
+  tibble::as_tibble() %>%
+  dplyr::mutate(
+    evt = 
+      forcats::fct_recode(
+        evt,
+        `Central Mixedgrass Prairie` = 
+          "Central Mixedgrass Prairie Grassland",
+        `Central Mixedgrass Prairie` = 
+          "Central Mixedgrass Prairie Shrubland",
+        `Inter-Mountain Basins Curl-leaf Mountain Mahogany Woodland and Shrubland` = 
+          "Inter-Mountain Basins Curl-leaf Mountain Mahogany Shrubland",
+        `Inter-Mountain Basins Curl-leaf Mountain Mahogany Woodland and Shrubland` = 
+          "Inter-Mountain Basins Curl-leaf Mountain Mahogany Woodland",
+        `Rocky Mountain Subalpine/Upper Montane Riparian Systems` = 
+          "Rocky Mountain Subalpine-Montane Riparian Shrubland",
+        `Rocky Mountain Subalpine/Upper Montane Riparian Systems` = 
+          "Rocky Mountain Subalpine-Montane Riparian Woodland",         
+        `Western Great Plains Floodplain Systems` = 
+          "Western Great Plains Floodplain Herbaceous",
+        `Western Great Plains Floodplain Systems` = 
+          "Western Great Plains Floodplain Shrubland",
+        `Western Great Plains Mesquite Woodland and Shrubland` = 
+          "Western Great Plains Mesquite Shrubland",
+        `North American Warm Desert Riparian Systems` = 
+          "North American Warm Desert Riparian Woodland",
+        `North American Warm Desert Riparian Systems` = 
+          "North American Warm Desert Riparian Shrubland",
+        `Rocky Mountain Montane Riparian Systems` = 
+          "Rocky Mountain Lower Montane-Foothill Riparian Shrubland",
+        `Rocky Mountain Montane Riparian Systems` = 
+          "Rocky Mountain Lower Montane-Foothill Riparian Woodland",
+        `Rocky Mountain Alpine/Montane Sparsely Vegetated Systems` = 
+          "Rocky Mountain Alpine Bedrock and Scree",
+        `Barren-Rock/Sand/Clay` = 
+          "Colorado Plateau Mixed Bedrock Canyon and Tableland",
+        `Barren-Rock/Sand/Clay` = 
+          "Inter-Mountain Basins Shale Badland",
+        `Barren-Rock/Sand/Clay` = 
+          "Inter-Mountain Basins Playa",
+        `Barren-Rock/Sand/Clay` =
+          "Inter-Mountain Basins Active and Stabilized Dune",
+        `Barren-Rock/Sand/Clay` =
+          "Inter-Mountain Basins Volcanic Rock and Cinder Land",
+        `Barren-Rock/Sand/Clay` = 
+          "Rocky Mountain Cliff Canyon and Massive Bedrock",
+        `Apacherian-Chihuahuan Semi-Desert Shrub-Steppe` =
+          "Edwards Plateau Limestone Shrubland",
+        `Inter-Mountain Basins Big Sagebrush Steppe` =
+          "Inter-Mountain Basins Big Sagebrush Shrubland",
+        `Inter-Mountain Basins Big Sagebrush Steppe` =
+          "Columbia Plateau Steppe and Grassland",
+        `Inter-Mountain Basins Mixed Salt Desert Scrub` =
+          "Great Basin & Intermountain Ruderal Shrubland",
+        `Barren-Rock/Sand/Clay` =
+          "Rocky Mountain Alpine/Montane Sparsely Vegetated Systems",
+        `Barren-Rock/Sand/Clay` =
+          "North American Warm Desert Active and Stabilized Dune",
+        `Apacherian-Chihuahuan Semi-Desert Shrub-Steppe` =
+          "North American Warm Desert Ruderal & Planted Scrub",
+        `Barren-Rock/Sand/Clay` = 
+          "North American Warm Desert Playa",
+        `Inter-Mountain Basins Big Sagebrush Steppe` =
+          "Inter-Mountain Basins Cliff and Canyon",
+        `Mojave Mid-Elevation Mixed Desert Scrub` =
+          "North American Warm Desert Bedrock Cliff and Outcrop",
+        `North American Warm Desert Badland` =
+          "North American Warm Desert Pavement",
+        `Inter-Mountain Basins Greasewood Flat` =
+          "Interior Western North American Temperate Ruderal Shrubland"
+      )
+  ) %>%
+  terra::setValues(template, values = .)
+
+
+# PRISM Elevation
+if(!file.exists("data-derived/elev_swus_paleocar.tif")){
+  elev <-
+    terra::rast("/vsizip//vsicurl/https://data.prism.oregonstate.edu/normals_bil/monthly/800m/dem/PRISM_us_dem_800m_bil.zip/PRISM_us_dem_800m_bil.bil") %>%
+    terra::crop(template) %>%
+    magrittr::set_names("elev") %>%
+    terra::writeRaster(
+      filename = "data-derived/elev_swus_paleocar.tif",
+      datatype = "INT4S",
+      overwrite = TRUE,
+      gdal = c("COMPRESS=ZSTD"),
+      memfrac = 0.9
+    )
+}
+
+elev <- 
+  terra::rast("data-derived/elev_swus_paleocar.tif")
+
+```
+
+We trained LightGBM (Ke et al. 2017) quantile regression models to predict log-transformed NPP at the 10th, 50th, and 90th percentiles. Our models treated EVT, disturbance type, and irrigated lands as categorical predictors and elevation, latitude, and longitude as continuous predictors. After training, we used these models to generate NPP predictions across the study area under a no-irrigation, no-disturbance scenario. We visualized the resulting median (50%) NPP map as a baseline productivity surface (Fig. S2). We then multiplied this surface by the proportion of years meeting Maize Farming Niche (MFN) thresholds to generate maps of “niche-attenuated NPP” (Fig. S3). Finally, we normalized these values relative to the central Mesa Verde region to estimate relative productivity maps (Fig. S4) that highlight agricultural potential across the Chaco Basin.
+
+```{r lightgbm}
+## Fit a GBM model to estimate NPP from Biophysical Setting
+
+if(!file.exists("data-derived/pre-european_npp_swus.tif")){
+  
+  
+  raster_to_long_tibble <-
+    function(x, ...){
+      x %>%
+        as.data.frame(xy = TRUE,
+                      na.rm = FALSE) %>%
+        tibble::as_tibble() %>%
+        tidyr::pivot_longer(!c(x,y),
+                            ...)
+    }
+  
+  landscape_data <-
+    list(
+      landfire$bps,
+      landfire$evt,
+      landfire$disturbance,
+      elev
+    ) %>%
+    terra::rast() %>%
+    as.data.frame(xy = TRUE,
+                  na.rm = FALSE) %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(evt = factor(evt,
+                               ordered = TRUE),
+                  bps = factor(bps,
+                               levels = levels(evt),
+                               ordered = TRUE)) %>%
+    dplyr::left_join(
+      modis_npp %>% 
+        magrittr::set_names(c(2002, 2007, 2012, 2017)) %>%
+        raster_to_long_tibble(names_to = "year", values_to = "NPP") %>%
+        dplyr::mutate(year = as.integer(year))
+    ) %>%
+    dplyr::left_join(
+      mirad_irrlands %>%
+        magrittr::set_names(c(2002, 2007, 2012, 2017)) %>%
+        raster_to_long_tibble(names_to = "year", values_to = "mirad_irrlands") %>%
+        dplyr::mutate(year = as.integer(year))
+    )
+  
+  training_data <-
+    landscape_data %>%
+    dplyr::mutate(dplyr::across(c(evt, disturbance, mirad_irrlands), 
+                                as.integer)) %>%
+    dplyr::filter(!is.na(NPP)) %>%
+    na.omit() %>%
+    dplyr::select(!c(year, bps))
+  
+  plan(multisession, workers = 3)
+  
+  lgb_mods <-
+    list(`10%` = 0.1, 
+         `50%` = 0.5, 
+         `90%` = 0.9) %>%
+    furrr::future_map(
+      \(x){
+        training_data %>%
+          {
+            lgb.train(
+              data = lgb.Dataset(
+                data = as.matrix(dplyr::select(., !NPP)), 
+                label = log1p(.$NPP),
+                categorical_feature = 
+                  c("evt", "disturbance", "mirad_irrlands")),
+              params = list(objective = "quantile",
+                            # metric = "quantile",
+                            alpha = x,
+                            metric = "rmse",
+                            num_leaves = 31,
+                            learning_rate = 0.05),
+              nrounds = 500L,
+              verbose = 1  # Show training progress 
+            )
+          }
+      }
+    )
+  
+  plan(sequential)
+  
+  prediction_data <-
+    landscape_data %>%
+    dplyr::mutate(disturbance = factor("Non Disturbed",
+                                       levels = levels(disturbance)),
+                  mirad_irrlands = 0L) %>%
+    dplyr::mutate(dplyr::across(c(bps, evt, disturbance, mirad_irrlands), 
+                                as.integer)) %>%
+    dplyr::select(!c(NPP, year, evt)) %>%
+    dplyr::rename(evt = bps) %>%
+    dplyr::distinct() %>%
+    dplyr::left_join(
+      template %>%
+        as.data.frame(xy = TRUE,
+                      na.rm = FALSE,
+                      cell = TRUE) %>%
+        dplyr::select(!lyr1), .) %>%
+    tibble::tibble() %>%
+    dplyr::arrange(cell) %>%
+    dplyr::select(!cell)
+  
+  lgb_predictions <-
+    lgb_mods %>%
+    purrr::map(
+      \(x){
+        predict(
+          x, 
+          as.matrix(prediction_data)
+        ) %>%
+          expm1() %>%
+          pmax(0) %>%
+          terra::setValues(template, values = .) %>%
+          terra::mask(elev)
+      }
+    ) %>%
+    terra::rast()
+  
+  lgb_predictions %>%
+    round() %>%
+    terra::writeRaster(
+      filename = "data-derived/pre-european_npp_swus.tif",
+      datatype = "INT2U",
+      overwrite = TRUE,
+      gdal = c("COMPRESS=ZSTD"),
+      memfrac = 0.9
+    )
+  
+}
+
+modeled_production <-
+  terra::rast("data-derived/pre-european_npp_swus.tif") %T>%
+  terra::set.values()
+
+```
+
+```{r relative-productivity}
+## A function that scales a raster proportional to the mean of an AOI. 
+## The mean of the AOI will be 1.
+calculate_relative_raster <-
+  function(x, aoi){
+    x %>%
+      terra::extract(
+        aoi,
+        fun = mean,
+        na.rm = TRUE,
+        touches = TRUE,
+        ID = FALSE) %>%
+      purrr::map2(.y = as.list(x),
+                  \(meve, rast){
+                    (rast / meve)
+                  }
+      ) %>%
+      terra::rast()
+  }
+
+niche_npp_periods <- 
+  niche_periods * modeled_production$`50%`
+
+relative_production <-
+  niche_npp_periods %>%
+  calculate_relative_raster(
+    aoi = chaco_regions %>%
+      dplyr::filter(region == "VEPIIN (850–1300)"))
+
+relative_production_regions <-
+  chaco_regions %>%
+  dplyr::filter(stringr::str_detect(region, "CRS")) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(relative_productivity = 
+                  list(
+                    terra::extract(
+                      relative_production,
+                      sf::st_as_sf(geometry),
+                      fun = mean,
+                      na.rm = TRUE,
+                      touches = TRUE,
+                      ID = FALSE)
+                  )
+  ) %>%
+  dplyr::ungroup() %>%
+  tidyr::unnest(relative_productivity) %>%
+  sf::st_drop_geometry() %T>%
+  readr::write_excel_csv("data-derived/relative_productivity.csv")
+
+
+```
+
+::: {#suppfig-s3}
+
+```{r Figure_s3}
+
+plot_map_array(
+  x = terra::rast("data-derived/pre-european_npp_swus.tif") %>%
+    terra::crop(chaco_basin,
+                touches = FALSE), 
+  
+  limits = c(0,12000), 
+  name = "\nNet Primary Productivity (kg C/ m²)",
+  labels = \(x){x * 0.0001},
+  facet = FALSE
+) %T>%
+  ggsave(plot = .,
+         filename = "figures/Figure_s3.png",
+         device = ragg::agg_png,
+         width = fig_width, 
+         height = fig_height,
+         bg = "white",
+         dpi = 600
+  )
+
+```
+
+Estimated pre-European Net Primary Productivity (NPP) across the U.S. Southwest. We used LightGBM quantile regression to model 10th, 50th (median), and 90th percentile NPP under pre-European conditions—excluding modern irrigation and recent disturbances—based on MODIS NPP data, elevation, and land cover characteristics. The resulting maps provide a baseline of landscape productivity in kg C/m².
+
+:::
+
+::: {#suppfig-s4}
+
+```{r Figure_s4}
+
+plot_map_array(
+  x = niche_npp_periods %>%
+    # purrr::map(\(x){x$`50%`}) %>%
+    # terra::rast() %>%
+    terra::crop(chaco_basin,
+                touches = FALSE), 
+  
+  limits = c(0,10000), 
+  name = "Niche-attenuated\nNet Primary Productivity (kg C/ m²)",
+  labels = \(x){x * 0.0001}
+) %T>%
+  ggsave(plot = .,
+         filename = "figures/Figure_s4.png",
+         device = ragg::agg_png,
+         width = fig_width, 
+         height = fig_height,
+         bg = "white",
+         dpi = 600
+  )
+
+```
+
+Niche-attenuated Net Primary Productivity (NPP) during key cultural periods. We multiplied median pre-European NPP (the center map in Fig. S2) by the proportion of years each pixel met the Maize Farming Niche (MFN) criteria (>250 mm precipitation and >1000 GDD) for three time periods: Early Chaco (850–1040), Late Chaco (1040–1150), and Post-Chaco (1150–1300). These maps represent how climate variability constrained potential agricultural productivity.
+
+:::
+
+::: {#suppfig-s5}
+
+```{r Figure_s5}
+
+plot_map_array(
+  x = relative_production %>%
+    # purrr::map(\(x){x$`50%`}) %>%
+    # terra::rast() %>%
+    terra::crop(chaco_basin,
+                touches = FALSE), 
+  limits = c(0,2), 
+  name = "\nRelative Production",
+  labels = scales::percent
+) %T>%
+  ggsave(plot = .,
+         filename = "figures/Figure_s5.png",
+         device = ragg::agg_png,
+         width = fig_width, 
+         height = fig_height,
+         bg = "white",
+         dpi = 600
+  )
+
+```
+
+Relative productivity across Chacoan regions during key cultural periods. We scaled niche-attenuated NPP values from each time period relative to the average value in the Central Mesa Verde region (set to 1) to create a unitless measure of agricultural potential. This relative comparison highlights spatial differences in productive capacity across Chacoan regions from A.D. 850 to 1300.
+
+:::
+
+
+
+```{r tab-2}
+footnote <-
+  "ᵃas graphed in Schwindt et al. (2016:Figure 3)
+ᵇcalculated as (Mean proportion potentially productive land, VEPIIN) x 4600 sq km
+ᶜcalculated as (Mean potentially productive sq km, CRS) x (people/potentially productive sq km, VEPIIN) 
+ᵈMomentary Population Estimate, CRS, x Average Productivity Relative to VEPIIN area
+ᵉterminal date as used by Van Dyke et al. (2016); 1280 used here"
+
+crs_niche <-
+  maize_farming_niche %>%
+  dplyr::bind_rows(.id = "region") %>%
+  dplyr::mutate(start = str_extract(region, "\\d+(?=–)"),
+                end = str_extract(region, "(?<=–)\\d+"),
+                dplyr::across(c(start, end), as.integer)) %>%
+  dplyr::filter(between(year, start, end)) %>%
+  dplyr::group_by(start, end, region) %>%
+  dplyr::summarise(
+    `Mean p potentially dry-farmable land, CRS` = 
+      mean(mean, na.rm = TRUE),
+    .groups = "drop") %>%
+  dplyr::arrange(region) %>%
+  dplyr::right_join(
+    chaco_regions %>%
+      dplyr::mutate(Area = sf::st_area(geometry) %>%
+                      units::set_units("km^2")) %>%
+      sf::st_drop_geometry()
+  ) %>%
+  dplyr::mutate(
+    `Mean potentially dry-farmable sq km, CRS` = 
+      `Mean p potentially dry-farmable land, CRS` * Area
+  )
+
+vepiin_population <-
+  readxl::read_excel("data-raw/Schwindt2016_Table2.xlsx") %>%
+  tidyr::pivot_longer(
+    !c(`begin (CE)`, `end (CE)`),
+    names_to = "type",
+    values_to = "Momentary Population Estimate, VEPIINᵃ") %>%
+  tidyr::separate_wider_delim(type, 
+                              delim = " - ", 
+                              names = c("subregion", "type")) %>%
+  dplyr::filter(subregion == "Study Area Total",
+                type != "80% “C. I.”") %>%
+  dplyr::group_by(`begin (CE)`,
+                  `end (CE)`,
+                  subregion) %>%
+  dplyr::summarise(
+    `Momentary Population Estimate, VEPIINᵃ` = 
+      sum(`Momentary Population Estimate, VEPIINᵃ`,
+          na.rm = TRUE)
+  ) %>%
+  tidyr::unite("VEP Periods (VEPIIN area = 4,600 sq km)", 
+               c(`begin (CE)`, `end (CE)`),
+               sep = "–",
+               remove = FALSE) %>%
+  dplyr::select(-subregion) 
+
+vepiin_population %<>%
+  # dplyr::mutate(dplyr::across(c(`begin (CE)`, `end (CE)`), as.integer)) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(year = list(tibble::tibble(year = `begin (CE)`:`end (CE)`))) %>%
+  tidyr::unnest(year) %>%
+  dplyr::left_join(maize_farming_niche$`VEPIIN (850–1300)`) %>%
+  dplyr::group_by(`begin (CE)`, `end (CE)`, `VEP Periods (VEPIIN area = 4,600 sq km)`) %>%
+  dplyr::summarise(`Mean p dry-farmable land, VEPIIN` = mean(mean),
+                   .groups = "drop") %>%
+  dplyr::arrange(`begin (CE)`) %>%
+  dplyr::select(!c(`begin (CE)`, `end (CE)`)) %>%
+  dplyr::left_join(vepiin_population) %>%
+  dplyr::mutate(
+    `People/dry-farmable sq km, VEPIINᵇ` = 
+      `Momentary Population Estimate, VEPIINᵃ` / 
+      (`Mean p dry-farmable land, VEPIIN` * 4600)
+  )
+
+
+crs_population <-
+  dplyr::cross_join(crs_niche, 
+                    vepiin_population) %>%
+  dplyr::filter(
+    dplyr::between(`begin (CE)`, start, end) | 
+      dplyr::between(`end (CE)`, start, end)
+  ) %>%
+  dplyr::group_by(
+    dplyr::across(
+      dplyr::all_of(
+        names(crs_niche)
+      )
+    )
+  ) %>%
+  dplyr::summarise(
+    `Mean People/dry-farmable sq km, VEPIINᵇ` = 
+      mean(`People/dry-farmable sq km, VEPIINᵇ`),
+    .groups = "drop"
+  ) %>%
+  dplyr::mutate(
+    `Momentary Population Estimate, CRS, mean (range)ᶜ` = 
+      `Mean potentially dry-farmable sq km, CRS` *
+      `Mean People/dry-farmable sq km, VEPIINᵇ`
+  )
+
+```
+
+
+## Objectives
+
+- Use gridded paleoclimatic reconstructions to estimate seasonal precipitation shortfalls.
+- Apply region-specific boundaries to extract and summarize climate data across time.
+- Generate structured Excel outputs for subsequent interpretation or visualization.
+
+## Requirements
+
+This analysis requires R (≥ 4.2.0) and the following packages:
+
+```r
+pak::pak(
+c(
+"magrittr", 
+"tidyverse", 
+"sf", 
+"terra",
+"openxlsx", 
+"slider",
+"exactextractr", 
+"village-ecodynamics/villager"
+))
+```
+
+Ensure GDAL and PROJ are properly configured to support spatial operations with `sf` and `terra`.
+
+## Running the Code
+
+The main script is [`tako-chaco-final.R`](tako-chaco-final.R). It performs the following steps:
+
+1. **Load spatial boundaries** for Chaco and Mesa Verde subregions from GeoJSON.
+2. **Access paleoclimatic precipitation reconstructions**, either from Amazon S3 or local copies.
+3. **Extract seasonal climate summaries** (e.g., wateryear, spring, summer precipitation) for each region and year.
+4. **Compute sliding window drought statistics**, identifying consecutive years of shortfall.
+5. **Export structured data** to Excel spreadsheets for each region and climate variable.
+
+_Note_: The script uses `AWS_NO_SIGN_REQUEST = "YES"` to access public climate datasets hosted on S3.
+
+## Output
+
+The script generates `.xlsx` files summarizing:
+
+- Annual precipitation by region and year
+- Duration and frequency of consecutive shortfall years
+- Threshold-based summaries for interpreting agricultural risk
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
+
+
