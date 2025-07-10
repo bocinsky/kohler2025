@@ -137,7 +137,7 @@ download_files <-
 
 ## Study Regions
 
-## The VEPIIN Study Area
+### The VEPIIN Study Area
 
 The VEPIIN study area in the Central Mesa Verde region was somewhat arbitrarily defined to encompass the great Sage Plin, Mesa Verde National Park, and Canyons of the Ancients National Monument, as well as the expend of hte Dolores Archaeological Program in Southwestern Colorado. Was aligned to the NAD83 UTM zone 12N coordinate reference system, and sedigned such that even numbers 200m-by-200m might be included along each axis. 
 
@@ -644,7 +644,7 @@ Percent of years in the maize dry-farming niche across Chacoan regions during ke
 
 :::
 
-## Modeling pre-European Net Primary Productivity
+## Pre-European Net Primary Productivity
 
 To model pre-European Net Primary Productivity (NPP), we estimated potential landscape productivity in the absence of modern irrigation and disturbance, establishing a baseline for past agricultural suitability. We used MODIS 250m annual NPP data for the years 2002, 2007, 2012, and 2017 (Rollins 2009), along with MIRAD irrigated lands data (Pervez and Brown 2010), Landfire datasets (Biophysical Settings, Existing Vegetation Types, Historical Disturbance; (Nelson et al. 2013; Rollins 2009), and PRISM 800m elevation data. We reprojected and aligned all datasets to a common spatial template based on the 800m PRISM dataset. For model training, we retained irrigated and disturbed pixels, but we excluded them during prediction to simulate pre-European conditions.
 
@@ -1665,7 +1665,7 @@ list(
 ```
 
 <details><summary>Session Info</summary>
-```{r, echo = FALSE}
+```{r session-info, echo = FALSE}
 # save the session info as an object
 pkg_sesh <- sessioninfo::session_info(pkgs = "attached")
 # get the quarto version
