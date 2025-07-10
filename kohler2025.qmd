@@ -15,6 +15,10 @@ crossref:
       latex-list-of-description: Supplementary Figure
 ---
 
+This R-based research compendium supports an analysis of climate variability and its impact on ancestral Pueblo demography in the Chaco Regional System. It draws on high-resolution paleoclimate reconstructions and spatial regional boundaries to estimate the frequency and duration of agricultural potential over time, and their relationship to the demography of the region.
+
+View the raw source code and output at: [https://github.com/bocinsky/kohler2025](https://github.com/bocinsky/kohler2025)
+
 ```{r setup}
 #| echo: false
 #| message: false
