@@ -1,14 +1,15 @@
 [![Last-updated](https://img.shields.io/badge/last%20update-July%202025-brightgreen.svg)](https://github.com/bocinsky/kohler2025)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](http://choosealicense.com/licenses/mit/)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bocinsky/kohler2025/main?urlpath=rstudio)
 
-## Research compendium package for Kohler, Brumbaugh, and Bocinsky (2025)
+## Research compendium for Kohler, Brumbaugh, and Bocinsky (2025)
 
 This R-based research compendium supports an analysis of climate variability and its impact on ancestral Pueblo demography in the Chaco Regional System. It draws on high-resolution paleoclimate reconstructions and spatial regional boundaries to estimate the frequency and duration of agricultural potential over time, and their relationship to the demography of the region.
 
+View the code and output at: [https://www.bocinsky.io/kohler2025/](https://www.bocinsky.io/kohler2025/)
+
 ### Overview
 
-The main script is [`kohler2025.qmd`](kohler2025.qmd) and output is written to [`kohler2025.html`](kohler2025.html). This is a Quarto markdown document that includes code to perform all analyses reported in the manuscript, as well as text descriptions of those analyses.
+The main script is [`kohler2025.qmd`](kohler2025.qmd) and output is written to [`index.html`](index.html). This is a Quarto markdown document that includes code to perform all analyses reported in the manuscript, as well as text descriptions of those analyses.
 
 [`kohler2025.qmd`](kohler2025.qmd) performs the following steps:
 

@@ -107,7 +107,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-chaco-regional-system" id="toc-the-chaco-regional-system" class="nav-link" data-scroll-target="#the-chaco-regional-system">The Chaco Regional System</a></li>
   </ul></li>
   <li><a href="#dryland-maize-farming-niche" id="toc-dryland-maize-farming-niche" class="nav-link" data-scroll-target="#dryland-maize-farming-niche">Dryland Maize Farming Niche</a></li>
-  <li><a href="#modeling-pre-european-net-primary-productivity" id="toc-modeling-pre-european-net-primary-productivity" class="nav-link" data-scroll-target="#modeling-pre-european-net-primary-productivity">Modeling pre-European Net Primary Productivity</a></li>
+  <li><a href="#modeling-pre-european-net-primary-productivity" id="toc-modeling-pre-european-net-primary-productivity" class="nav-link" data-scroll-target="#modeling-pre-european-net-primary-productivity">Modeling pre-European Net Primary Productivity</a>
+  <ul class="collapse">
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data preparation</a></li>
+  <li><a href="#estimating-pre-european-net-primary-productivity-npp-using-gradient-boosted-models" id="toc-estimating-pre-european-net-primary-productivity-npp-using-gradient-boosted-models" class="nav-link" data-scroll-target="#estimating-pre-european-net-primary-productivity-npp-using-gradient-boosted-models">Estimating Pre-European Net Primary Productivity (NPP) Using Gradient Boosted Models</a></li>
+  <li><a href="#calculating-relative-maize-productivity-by-region" id="toc-calculating-relative-maize-productivity-by-region" class="nav-link" data-scroll-target="#calculating-relative-maize-productivity-by-region">Calculating Relative Maize Productivity by Region</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -187,7 +192,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -198,17 +202,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lwd =</span> <span class="dv">3</span>,</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">layer.name =</span> <span class="st">"Region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div id="fig-map-regions" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="center">
+<div id="fig-map-regions" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
 <div aria-describedby="fig-map-regions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="leaflet html-widget html-fill-item" id="htmlwidget-6e61a9212c0e6115fbba" style="width:100%;height:260px;"></div>
-<script type="application/json" data-for="htmlwidget-6e61a9212c0e6115fbba">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["polygon",420]},{"method":"addPolygons","args":[[[[{"lng":[-108.9433835067014,-109.552795410925,-109.5561778132309,-109.5592136207659,-109.5616057248418,-109.5631199634718,-109.5636080451151,-109.5630220901726,-109.5614193570183,-109.5589566749707,-109.0305488003595,-109.1173664007151,-109.1188985760194,-109.1193794062119,-109.1187617114884,-109.1171058486304,-109.1145738439324,-109.1114135563055,-109.1079344118346,-109.1044770863005,-108.1685824454908,-108.1655117014479,-108.1631107757973,-108.1616146749479,-107.7407271705574,-107.6391867894633,-107.6387644292095,-107.6394174425079,-107.6410818109817,-107.6435945637578,-107.6881864521305,-107.6912997341643,-108.9399837211961,-108.9433835067014],"lat":[35.10777328663495,35.11721422949334,35.11769586134165,35.11901266032363,35.12103576595605,35.12356718550593,35.12635915850417,35.12913839684497,35.13163283242744,35.13359825551703,35.72566186098808,36.92235378858925,36.92489065892773,36.92768350057297,36.93045894006379,36.93294527904355,36.93489909723548,36.9361290954288,36.93651483870987,36.93601855851567,36.71839235993613,36.71703920335757,36.71498829145951,36.7124404271318,35.98864294173935,35.34720623545293,35.34440969106944,35.34164307972429,35.33917719488259,35.33725337454909,35.30341916056209,35.30222441440467,35.10815677924445,35.10777328663495]}]],[[{"lng":[-107.305924318682,-107.3024708782463,-107.299398577562,-107.2970082095228,-107.2955337428468,-107.2951194261657,-107.2958056994812,-107.2975252800093,-107.3001097885957,-107.3033062526788,-107.7793951646955,-107.6669308438047,-107.664564748046,-107.122777582172,-107.1197714834059,-107.1174329927233,-107.1159910010004,-107.1155865836992,-107.1162592207542,-107.117942972974,-107.9635871716506,-107.9660707219092,-108.5278177507276,-108.5308815897636,-108.5342492020263,-108.5375910419093,-109.0154102328374,-109.0184114193041,-109.7948177078468,-109.7972125313335,-109.7987321413771,-110.0300522573082,-110.0305607946628,-110.0299841660097,-110.0283787120062,-110.025901524182,-109.8692587900611,-109.86614667214,-109.220245898488,-109.5635792698604,-109.566036260976,-109.9435480626664,-109.9466847242627,-109.9491603491597,-109.9507326010038,-109.9512475025939,-109.9506545365702,-109.9490116343967,-109.9464795484904,-109.7064361966094,-109.7032516282573,-109.6997384780986,-109.0713845306902,-108.8688542585342,-108.8653641027274,-108.8622409575583,-108.5388265462065,-107.305924318682],"lat":[37.20070238788016,37.20015356642254,37.1987778624497,37.19670998249779,37.19415239100038,37.19135547410546,37.18859301819322,37.18613540798682,37.18422316847808,37.18304343709727,36.09255213026282,35.98409910855371,35.9820397152595,35.5266301340767,35.52525355493997,35.52318491408031,35.52062674762579,35.51782949559237,35.51506697605032,35.5126095805585,34.65380039410076,34.65186820828207,34.29523709220928,34.29401836935271,34.29364498442202,34.29415348024676,34.40661768432123,34.40794703204788,35.00482783370042,35.00684638082235,35.00937501367565,35.94056536860839,35.94335545886459,35.94613678049059,35.94863706218725,35.9506115215709,36.03407289068009,36.03532403542888,36.58183784430391,37.28015861330124,37.28218242330345,37.53231680312631,37.53362505736085,37.5356411245177,37.53816770485597,37.54095751540453,37.54373748186818,37.5462354645238,37.5482069037252,37.71813806667475,37.71938324317215,37.71978565808125,37.70871885763092,37.69587651199053,37.69537228751902,37.69403565687448,37.48484358666187,37.20070238788016]}]],[[{"lng":[-107.9912845567882,-107.9878827129075,-107.9863904067553,-107.9859515070882,-107.934751020479,-107.5196973295036,-107.5182360438335,-107.5178166160064,-107.5184799935929,-107.5201611411467,-107.5570510688047,-107.8083070367124,-107.8089504015939,-107.9619476040057,-107.9635871716506,-107.9660707219092,-108.3256575986014,-108.3287304363676,-108.332105483944,-109.0022929927928,-109.0120603645079,-109.0154102328374,-109.0184114193041,-109.9015205588982,-109.9039137493893,-109.9054340035731,-109.9059324430692,-109.9053601761088,-109.8633998579061,-110.139159819751,-110.1415952668491,-110.1431456053887,-110.1436590089211,-110.1430851148712,-110.1414799952581,-110.1390007079922,-110.1358899468068,-109.6013899759165,-109.9553969741381,-109.9578686417065,-109.9594385756416,-109.9599530261367,-109.9593615207343,-109.9577218486282,-109.6473368811227,-109.6447930467105,-109.6416098941877,-109.6380990885554,-109.0690267354427,-108.8566958213405,-108.8532097772368,-108.8500904059595,-108.6995759881763,-108.4971510669192,-108.4947206605868,-107.9912845567882],"lat":[36.84499700969853,36.84111709598776,36.83856722239359,36.83577148954024,36.58245524888608,35.91306939905193,35.91051504539114,35.9077183625419,35.9049531140514,35.90248995934613,35.849882958195,34.97356037007695,34.970792232422,34.65627217865605,34.65380039410076,34.65186820828207,34.46616359171126,34.46495038784392,34.46458293724262,34.40515134351494,34.40612198270691,34.40661768432123,34.40794703204788,34.85294869003519,34.85496514863019,34.85749251754959,34.8602834330462,34.86306471127625,35.74815217491993,36.08889276111174,36.09090474596322,36.09342907548486,36.09621868542204,36.09900052091305,36.10150226056134,36.10347897923511,36.10473713733912,36.69727213124574,37.40380246386371,37.40581833101351,37.40834481361473,37.41113463810218,37.4139147287753,37.4164129338475,37.66079151947229,37.66275622760839,37.6639997759918,37.66440040145359,37.63167187196819,37.60957515867993,37.60907069354289,37.60773384017079,37.52141925301009,37.38660728223375,37.38456214338363,36.84499700969853]}]],[[{"lng":[-109.056776011309,-108.3017334880271,-108.2797265433041,-109.0409147711252,-109.056776011309],"lat":[37.0483342225742,37.03355829872128,37.64581792069022,37.66092254758372,37.0483342225742]}]]],null,"Region",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"polygon","stroke":true,"color":["#001959","#3B6C55","#D29243","#000000"],"weight":3,"opacity":[0.9,0.9,0.9,0.9],"fill":true,"fillColor":["#001959","#3B6C55","#D29243","#000000"],"fillOpacity":[0,0,0,0],"smoothFactor":1,"noClip":false},["<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>E CRS (850–1040)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>2&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>L CRS (1040–1150)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>3&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>P CRS (1150–1300)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>4&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>VEPIIN (850–1300)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>"],{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},["E CRS (850–1040)","L CRS (1040–1150)","P CRS (1150–1300)","VEPIIN (850–1300)"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},{"stroke":true,"weight":5,"opacity":0.9,"fillOpacity":0,"bringToFront":false,"sendToBack":false}]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-110.1436590089211,34.29364498442202,-107.1155865836992,37.71978565808125,true,"Region","Zoom to Region","<strong> Region <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],"Region",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#001959","#3B6C55","#D29243","#000000"],"labels":["E CRS (850–1040)","L CRS (1040–1150)","P CRS (1150–1300)","VEPIIN (850–1300)"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"Region","extra":null,"layerId":null,"className":"info legend","group":"Region"}]}],"limits":{"lat":[34.29364498442202,37.71978565808125],"lng":[-110.1436590089211,-107.1155865836992]},"fitBounds":[34.29364498442202,-110.1436590089211,37.71978565808125,-107.1155865836992,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\"position\":\"relative\",\"bottomleft\":\"0px\",\"background-color\":\"rgba(255, 255, 255, 0.7)\",\"box-shadow\":\"0 0 2px #bbb\",\"background-clip\":\"padding-box\",\"margin\":\"0\",\"padding-left\":\"5px\",\"padding-right\":\"5px\",\"color\":\"#333\",\"font-size\":\"9px\",\"font-family\":\"\\\"Helvetica Neue\\\", Arial, Helvetica, sans-serif\",\"text-align\":\"left\",\"z-index\":\"700\"});\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-ce35cf8ac876eb75eff9" style="width:100%;height:260px;"></div>
+<script type="application/json" data-for="htmlwidget-ce35cf8ac876eb75eff9">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["polygon",420]},{"method":"addPolygons","args":[[[[{"lng":[-108.9433835067014,-109.552795410925,-109.5561778132309,-109.5592136207659,-109.5616057248418,-109.5631199634718,-109.5636080451151,-109.5630220901726,-109.5614193570183,-109.5589566749707,-109.0305488003595,-109.1173664007151,-109.1188985760194,-109.1193794062119,-109.1187617114884,-109.1171058486304,-109.1145738439324,-109.1114135563055,-109.1079344118346,-109.1044770863005,-108.1685824454908,-108.1655117014479,-108.1631107757973,-108.1616146749479,-107.7407271705574,-107.6391867894633,-107.6387644292095,-107.6394174425079,-107.6410818109817,-107.6435945637578,-107.6881864521305,-107.6912997341643,-108.9399837211961,-108.9433835067014],"lat":[35.10777328663495,35.11721422949334,35.11769586134165,35.11901266032363,35.12103576595605,35.12356718550593,35.12635915850417,35.12913839684497,35.13163283242744,35.13359825551703,35.72566186098808,36.92235378858925,36.92489065892773,36.92768350057297,36.93045894006379,36.93294527904355,36.93489909723548,36.9361290954288,36.93651483870987,36.93601855851567,36.71839235993613,36.71703920335757,36.71498829145951,36.7124404271318,35.98864294173935,35.34720623545293,35.34440969106944,35.34164307972429,35.33917719488259,35.33725337454909,35.30341916056209,35.30222441440467,35.10815677924445,35.10777328663495]}]],[[{"lng":[-107.305924318682,-107.3024708782463,-107.299398577562,-107.2970082095228,-107.2955337428468,-107.2951194261657,-107.2958056994812,-107.2975252800093,-107.3001097885957,-107.3033062526788,-107.7793951646955,-107.6669308438047,-107.664564748046,-107.122777582172,-107.1197714834059,-107.1174329927233,-107.1159910010004,-107.1155865836992,-107.1162592207542,-107.117942972974,-107.9635871716506,-107.9660707219092,-108.5278177507276,-108.5308815897636,-108.5342492020263,-108.5375910419093,-109.0154102328374,-109.0184114193041,-109.7948177078468,-109.7972125313335,-109.7987321413771,-110.0300522573082,-110.0305607946628,-110.0299841660097,-110.0283787120062,-110.025901524182,-109.8692587900611,-109.86614667214,-109.220245898488,-109.5635792698604,-109.566036260976,-109.9435480626664,-109.9466847242627,-109.9491603491597,-109.9507326010038,-109.9512475025939,-109.9506545365702,-109.9490116343967,-109.9464795484904,-109.7064361966094,-109.7032516282573,-109.6997384780986,-109.0713845306902,-108.8688542585342,-108.8653641027274,-108.8622409575583,-108.5388265462065,-107.305924318682],"lat":[37.20070238788016,37.20015356642254,37.1987778624497,37.19670998249779,37.19415239100038,37.19135547410546,37.18859301819322,37.18613540798682,37.18422316847808,37.18304343709727,36.09255213026282,35.98409910855371,35.9820397152595,35.5266301340767,35.52525355493997,35.52318491408031,35.52062674762579,35.51782949559237,35.51506697605032,35.5126095805585,34.65380039410076,34.65186820828207,34.29523709220928,34.29401836935271,34.29364498442202,34.29415348024676,34.40661768432123,34.40794703204788,35.00482783370042,35.00684638082235,35.00937501367565,35.94056536860839,35.94335545886459,35.94613678049059,35.94863706218725,35.9506115215709,36.03407289068009,36.03532403542888,36.58183784430391,37.28015861330124,37.28218242330345,37.53231680312631,37.53362505736085,37.5356411245177,37.53816770485597,37.54095751540453,37.54373748186818,37.5462354645238,37.5482069037252,37.71813806667475,37.71938324317215,37.71978565808125,37.70871885763092,37.69587651199053,37.69537228751902,37.69403565687448,37.48484358666187,37.20070238788016]}]],[[{"lng":[-107.9912845567882,-107.9878827129075,-107.9863904067553,-107.9859515070882,-107.934751020479,-107.5196973295036,-107.5182360438335,-107.5178166160064,-107.5184799935929,-107.5201611411467,-107.5570510688047,-107.8083070367124,-107.8089504015939,-107.9619476040057,-107.9635871716506,-107.9660707219092,-108.3256575986014,-108.3287304363676,-108.332105483944,-109.0022929927928,-109.0120603645079,-109.0154102328374,-109.0184114193041,-109.9015205588982,-109.9039137493893,-109.9054340035731,-109.9059324430692,-109.9053601761088,-109.8633998579061,-110.139159819751,-110.1415952668491,-110.1431456053887,-110.1436590089211,-110.1430851148712,-110.1414799952581,-110.1390007079922,-110.1358899468068,-109.6013899759165,-109.9553969741381,-109.9578686417065,-109.9594385756416,-109.9599530261367,-109.9593615207343,-109.9577218486282,-109.6473368811227,-109.6447930467105,-109.6416098941877,-109.6380990885554,-109.0690267354427,-108.8566958213405,-108.8532097772368,-108.8500904059595,-108.6995759881763,-108.4971510669192,-108.4947206605868,-107.9912845567882],"lat":[36.84499700969853,36.84111709598776,36.83856722239359,36.83577148954024,36.58245524888608,35.91306939905193,35.91051504539114,35.9077183625419,35.9049531140514,35.90248995934613,35.849882958195,34.97356037007695,34.970792232422,34.65627217865605,34.65380039410076,34.65186820828207,34.46616359171126,34.46495038784392,34.46458293724262,34.40515134351494,34.40612198270691,34.40661768432123,34.40794703204788,34.85294869003519,34.85496514863019,34.85749251754959,34.8602834330462,34.86306471127625,35.74815217491993,36.08889276111174,36.09090474596322,36.09342907548486,36.09621868542204,36.09900052091305,36.10150226056134,36.10347897923511,36.10473713733912,36.69727213124574,37.40380246386371,37.40581833101351,37.40834481361473,37.41113463810218,37.4139147287753,37.4164129338475,37.66079151947229,37.66275622760839,37.6639997759918,37.66440040145359,37.63167187196819,37.60957515867993,37.60907069354289,37.60773384017079,37.52141925301009,37.38660728223375,37.38456214338363,36.84499700969853]}]],[[{"lng":[-109.056776011309,-108.3017334880271,-108.2797265433041,-109.0409147711252,-109.056776011309],"lat":[37.0483342225742,37.03355829872128,37.64581792069022,37.66092254758372,37.0483342225742]}]]],null,"Region",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"polygon","stroke":true,"color":["#001959","#3B6C55","#D29243","#000000"],"weight":3,"opacity":[0.9,0.9,0.9,0.9],"fill":true,"fillColor":["#001959","#3B6C55","#D29243","#000000"],"fillOpacity":[0,0,0,0],"smoothFactor":1,"noClip":false},["<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>E CRS (850–1040)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>2&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>L CRS (1040–1150)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>3&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>P CRS (1150–1300)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>4&emsp;<\/td><\/tr><tr><td>1<\/td><th>region&emsp;<\/th><td>VEPIIN (850–1300)&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>"],{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},["E CRS (850–1040)","L CRS (1040–1150)","P CRS (1150–1300)","VEPIIN (850–1300)"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},{"stroke":true,"weight":5,"opacity":0.9,"fillOpacity":0,"bringToFront":false,"sendToBack":false}]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-110.1436590089211,34.29364498442202,-107.1155865836992,37.71978565808125,true,"Region","Zoom to Region","<strong> Region <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],"Region",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#001959","#3B6C55","#D29243","#000000"],"labels":["E CRS (850–1040)","L CRS (1040–1150)","P CRS (1150–1300)","VEPIIN (850–1300)"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"Region","extra":null,"layerId":null,"className":"info legend","group":"Region"}]}],"limits":{"lat":[34.29364498442202,37.71978565808125],"lng":[-110.1436590089211,-107.1155865836992]},"fitBounds":[34.29364498442202,-110.1436590089211,37.71978565808125,-107.1155865836992,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\"position\":\"relative\",\"bottomleft\":\"0px\",\"background-color\":\"rgba(255, 255, 255, 0.7)\",\"box-shadow\":\"0 0 2px #bbb\",\"background-clip\":\"padding-box\",\"margin\":\"0\",\"padding-left\":\"5px\",\"padding-right\":\"5px\",\"color\":\"#333\",\"font-size\":\"9px\",\"font-family\":\"\\\"Helvetica Neue\\\", Arial, Helvetica, sans-serif\",\"text-align\":\"left\",\"z-index\":\"700\"});\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-map-regions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-map-regions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a)
 </figcaption>
 </figure>
 </div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: <strong>Extent of the Chaco Regional System during the Early CRS (AD 850-1039), Late CRS (1040-1149), and Post-CRS (1150-1300), with the VEPIIN area.</strong> Extrema identified for the Early and Late CRS. This map in the main manuscript was made in QGIS by Laura Brumbaugh.
+</figcaption>
+</figure>
 </div>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -298,14 +312,15 @@ Figure&nbsp;1
 </section>
 <section id="dryland-maize-farming-niche" class="level2">
 <h2 class="anchored" data-anchor-id="dryland-maize-farming-niche">Dryland Maize Farming Niche</h2>
+<p>Here, we derive a dryland maize farming niche from paleoclimate reconstructions provided by the <em>Synthesizing Knowledge of Past Environments (SKOPE)</em> project. This code computes the Maize Farming Niche (MFN) for the U.S. Southwest by combining gridded paleoclimate reconstructions of precipitation and growing degree days (GDD), which we download from Amazon S3. We begin by defining output file paths and retrieving the relevant PaleoCAR raster data. We then generate a binary raster indicating areas suitable for maize cultivation—those where both precipitation and GDD exceed specified thresholds (e.g., GDD &gt; 1000). If this MFN raster does not already exist, we compute it and save it to disk. Next, we extract mean and standard deviation MFN values for each region in chaco_regions, summarizing the results in an Excel spreadsheet. Finally, we compute average MFN conditions for key archaeological periods (Early, Late, Post-Chaco, and VEPIIN) by averaging the relevant yearly layers in the raster stack.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mfn_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">"data-derived"</span>,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">paste0</span>(<span class="st">"maize_farming_niche_"</span>,gdd_threshold,<span class="st">".xlsx"</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">paste0</span>(<span class="st">"maize_farming_niche_"</span>,ppt_threshold,<span class="st">".xlsx"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>mfn_rast_path <span class="ot">&lt;-</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="st">"data-raw/maize_farming_niche_swus_paleocar_"</span>,gdd_threshold,<span class="st">".tif"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="st">"data-raw/maize_farming_niche_swus_paleocar_"</span>,ppt_threshold,<span class="st">".tif"</span>)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Download PaleoCAR Maize niche data from Amazon S3.</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>mfn_sources <span class="ot">&lt;-</span></span>
@@ -332,7 +347,7 @@ Figure&nbsp;1
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  ppt_niche <span class="ot">&lt;-</span></span>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">rast</span>(mfn_sources<span class="sc">$</span>ppt) <span class="sc">%T&gt;%</span></span>
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">set.values</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    magrittr<span class="sc">::</span><span class="fu">is_weakly_greater_than</span>(gdd_threshold)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    magrittr<span class="sc">::</span><span class="fu">is_weakly_greater_than</span>(ppt_threshold)</span>
 <span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  gdd_niche <span class="ot">&lt;-</span></span>
 <span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">rast</span>(mfn_sources<span class="sc">$</span>gdd) <span class="sc">%T&gt;%</span></span>
@@ -415,6 +430,7 @@ Figure&nbsp;1
 <span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">rast</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>Here, we implement a sliding linear regressions smoothing model on the maize farming niche, and plot the resulting figure.</p>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -503,7 +519,7 @@ Figure&nbsp;1
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste0</span>(<span class="st">"figures/Figure_2_"</span>, gdd_threshold, <span class="st">".png"</span>), </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste0</span>(<span class="st">"figures/Figure_2_"</span>, ppt_threshold, <span class="st">".png"</span>), </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">device =</span> ragg<span class="sc">::</span>agg_png, </span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">width =</span> fig_width, </span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">height =</span> fig_height,</span>
@@ -525,10 +541,11 @@ Figure&nbsp;1
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Average proportion of cells within the maize dry-farming niche through time for the four regions outlined in Figure 1. E CRS (etc.) indicates Early Chaco Regional System. The proportion of cells in the dry-farming niche is determined by tree-ring-based estimates of temperature and precipitation (Bocinsky and Kohler 2014). Cells with precipitation &gt;= 300mm and Growing Degree Days &gt;= 1000 are deemed within the niche. The point estimate plotted for each year is based on a linear regression of year on maize-niche proportion, using a moving window containing the previous 10 years. For example, the value plotted for AD 900 is the linear prediction using niche proportions from AD 890 to 899. The standard error for each regression is used to calculate 80% CIs around the point estimates, shown by the shaded areas. A simpler view of these data, by decadal means, is presented in Figure S1.
+Figure&nbsp;2: Average proportion of cells within the maize dry-farming niche through time for the four regions outlined in Figure 1. E CRS (etc.) indicates Early Chaco Regional System. The proportion of cells in the dry-farming niche is determined by tree-ring-based estimates of temperature and precipitation (Bocinsky and Kohler 2014). Cells with precipitation &gt;= 250mm and Growing Degree Days &gt;= 1000 are deemed within the niche. The point estimate plotted for each year is based on a linear regression of year on maize-niche proportion, using a moving window containing the previous 10 years. For example, the value plotted for AD 900 is the linear prediction using niche proportions from AD 890 to 899. The standard error for each regression is used to calculate 80% CIs around the point estimates, shown by the shaded areas. A simpler view of these data, by decadal means, is presented in Figure S1.
 </figcaption>
 </figure>
 </div>
+<p>In <a href="#suppfig-s1" class="quarto-xref">Figure S1</a>, we present a simplified version of <a href="#fig-2" class="quarto-xref">Figure&nbsp;2</a> using decadal means, as calculated here.</p>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -605,7 +622,7 @@ Figure&nbsp;2: Average proportion of cells within the maize dry-farming niche th
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste0</span>(<span class="st">"figures/Figure_s1_"</span>, gdd_threshold, <span class="st">".png"</span>), </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste0</span>(<span class="st">"figures/Figure_s1_"</span>, ppt_threshold, <span class="st">".png"</span>), </span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">device =</span> ragg<span class="sc">::</span>agg_png, </span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">width =</span> fig_width, </span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">height =</span> fig_height,</span>
@@ -631,6 +648,7 @@ Figure S1: Average proportion of cells within the maize dry-farming niche by dec
 </figcaption>
 </figure>
 </div>
+<p>The Maize Farming Niche may be visualized as the proportion of years within a given period that meet the niche thresholds (here, 250 mm of water year precipitation and 1000 growing degree days).</p>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -647,7 +665,7 @@ Figure S1: Average proportion of cells within the maize dry-farming niche by dec
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  ) </span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%T&gt;%</span></span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggsave</span>(<span class="at">plot =</span> .,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"figures/Figure_s2_"</span>, gdd_threshold, <span class="st">".png"</span>),</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"figures/Figure_s2_"</span>, ppt_threshold, <span class="st">".png"</span>),</span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">device =</span> ragg<span class="sc">::</span>agg_png,</span>
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">width =</span> fig_width, </span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> fig_height,</span>
@@ -677,6 +695,51 @@ Figure S2: Percent of years in the maize dry-farming niche across Chacoan region
 <section id="modeling-pre-european-net-primary-productivity" class="level2">
 <h2 class="anchored" data-anchor-id="modeling-pre-european-net-primary-productivity">Modeling pre-European Net Primary Productivity</h2>
 <p>To model pre-European Net Primary Productivity (NPP), we estimated potential landscape productivity in the absence of modern irrigation and disturbance, establishing a baseline for past agricultural suitability. We used MODIS 250m annual NPP data for the years 2002, 2007, 2012, and 2017 (Rollins 2009), along with MIRAD irrigated lands data (Pervez and Brown 2010), Landfire datasets (Biophysical Settings, Existing Vegetation Types, Historical Disturbance; (Nelson et al.&nbsp;2013; Rollins 2009), and PRISM 800m elevation data. We reprojected and aligned all datasets to a common spatial template based on the 800m PRISM dataset. For model training, we retained irrigated and disturbed pixels, but we excluded them during prediction to simulate pre-European conditions.</p>
+<p>This section of the code prepares the environmental raster datasets at a common resolution and extent. Specifically, we resample, reclassify, and align data on productivity, irrigation, vegetation, disturbance, and elevation to a shared spatial template.</p>
+<section id="data-preparation" class="level3">
+<h3 class="anchored" data-anchor-id="data-preparation">Data preparation</h3>
+<section id="establish-a-template-raster" class="level4">
+<h4 class="anchored" data-anchor-id="establish-a-template-raster">1. Establish a Template Raster</h4>
+<p>We create a single-layer raster template based on the Maize Farming Niche data to use as a consistent spatial reference for projection and alignment.</p>
+</section>
+<section id="modis-net-primary-productivity-npp" class="level4">
+<h4 class="anchored" data-anchor-id="modis-net-primary-productivity-npp">2. MODIS Net Primary Productivity (NPP)</h4>
+<ul>
+<li>We download 250-meter MODIS NPP rasters for selected years (2002, 2007, 2012, 2017) from the <a href="http://files.ntsg.umt.edu/data/NTSG_Products/MOD17/">Numerical Terradynamic Simulation Group (NTSG)</a>.</li>
+<li>We extract the <code>annualNPP</code> layer, project it to the template grid using bilinear interpolation, and save the output as a compressed raster stack.</li>
+</ul>
+</section>
+<section id="irrigated-lands-mirad" class="level4">
+<h4 class="anchored" data-anchor-id="irrigated-lands-mirad">3. Irrigated Lands (MIRAD)</h4>
+<ul>
+<li>We query and download MIRAD-derived irrigated lands data from the USGS ScienceBase repository (<a href="https://doi.org/10.5066/P9NA3EO8">DOI:10.5066/P9NA3EO8</a>).</li>
+<li>We load the relevant 250m rasters, project them to our template using <code>max</code> resampling (preserving irrigated presence), and save the result as a binary raster.</li>
+</ul>
+</section>
+<section id="landfire-vegetation-and-disturbance-layers" class="level4">
+<h4 class="anchored" data-anchor-id="landfire-vegetation-and-disturbance-layers">4. LANDFIRE Vegetation and Disturbance Layers</h4>
+<ul>
+<li>We download three datasets from LANDFIRE:
+<ul>
+<li><strong>Biophysical Settings (BPS)</strong>: <a href="https://www.landfire.gov/data-downloads/US_220/LF2020_BPS_220_CONUS.zip">LF2020 BPS</a></li>
+<li><strong>Historical Disturbance (HDist)</strong>: <a href="https://www.landfire.gov/data-downloads/US_Disturbance/LF2023_HDist_240_CONUS.zip">LF2023 HDist</a></li>
+<li><strong>Existing Vegetation Types (EVT)</strong>: <a href="https://www.landfire.gov/data-downloads/US_240/LF2023_EVT_240_CONUS.zip">LF2023 EVT</a></li>
+</ul></li>
+<li>For each dataset:
+<ul>
+<li>We unzip the file, extract the raster and its corresponding classification CSV.</li>
+<li>We project it to our template using <code>mode</code> resampling (preserving dominant class).</li>
+<li>We recategorize factor levels to consolidate similar vegetation types or correct naming inconsistencies.</li>
+</ul></li>
+<li>We then assemble the BPS, EVT, and HDist layers into a single multi-layer raster object.</li>
+</ul>
+</section>
+<section id="prism-elevation" class="level4">
+<h4 class="anchored" data-anchor-id="prism-elevation">5. PRISM Elevation</h4>
+<ul>
+<li>We download the 800-meter DEM from the <a href="https://prism.oregonstate.edu">PRISM Climate Group</a> via a virtual file system call (<code>/vsicurl</code>).</li>
+<li>We crop it to the template extent and save the result for elevation analysis.</li>
+</ul>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1102,7 +1165,53 @@ Figure S2: Percent of years in the maize dry-farming niche across Chacoan region
 <span id="cb11-420"><a href="#cb11-420" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"data-derived/elev_swus_paleocar.tif"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>We trained LightGBM (Ke et al.&nbsp;2017) quantile regression models to predict log-transformed NPP at the 10th, 50th, and 90th percentiles. Our models treated EVT, disturbance type, and irrigated lands as categorical predictors and elevation, latitude, and longitude as continuous predictors. After training, we used these models to generate NPP predictions across the study area under a no-irrigation, no-disturbance scenario. We visualized the resulting median (50%) NPP map as a baseline productivity surface (Fig. S2). We then multiplied this surface by the proportion of years meeting Maize Farming Niche (MFN) thresholds to generate maps of “niche-attenuated NPP” (Fig. S3). Finally, we normalized these values relative to the central Mesa Verde region to estimate relative productivity maps (Fig. S4) that highlight agricultural potential across the Chaco Basin.</p>
+<p>We trained LightGBM (Ke et al.&nbsp;2017) quantile regression models to predict log-transformed NPP at the 10th, 50th, and 90th percentiles. Our models treated EVT, disturbance type, and irrigated lands as categorical predictors and elevation, latitude, and longitude as continuous predictors. After training, we used these models to generate NPP predictions across the study area under a no-irrigation, no-disturbance scenario. We visualized the resulting median (50%) NPP map as a baseline productivity surface (<a href="#suppfig-s3" class="quarto-xref">Figure S3</a>). We then multiplied this surface by the proportion of years meeting Maize Farming Niche (MFN) thresholds to generate maps of “niche-attenuated NPP” (<a href="#suppfig-s4" class="quarto-xref">Figure S4</a>). Finally, we normalized these values relative to the central Mesa Verde region to estimate relative productivity maps (<a href="#suppfig-s5" class="quarto-xref">Figure S5</a>) that highlight agricultural potential across the Chaco Basin.</p>
+</section>
+</section>
+<section id="estimating-pre-european-net-primary-productivity-npp-using-gradient-boosted-models" class="level3">
+<h3 class="anchored" data-anchor-id="estimating-pre-european-net-primary-productivity-npp-using-gradient-boosted-models">Estimating Pre-European Net Primary Productivity (NPP) Using Gradient Boosted Models</h3>
+<p>This code fits a quantile-based LightGBM (Gradient Boosted Machine) model to estimate <strong>pre-European NPP</strong> based on landscape characteristics in the U.S. Southwest. The process includes the following steps:</p>
+<ol type="1">
+<li><strong>Data Assembly</strong>
+<ul>
+<li>We construct a spatial dataset (<code>landscape_data</code>) by combining:
+<ul>
+<li>LANDFIRE Biophysical Settings (BPS), Existing Vegetation Types (EVT), and Disturbance data</li>
+<li>PRISM elevation</li>
+<li>MODIS-derived NPP (for years 2002, 2007, 2012, 2017)</li>
+<li>MIRAD irrigated lands</li>
+</ul></li>
+<li>Data are merged by year and converted to tidy, long format.</li>
+</ul></li>
+<li><strong>Training Data Preparation</strong>
+<ul>
+<li>We convert categorical predictors to integers, remove missing values, and drop unused fields (e.g., year, BPS).</li>
+<li>The response variable is the natural log of NPP plus one (<code>log1p(NPP)</code>), which helps handle skewed data.</li>
+</ul></li>
+<li><strong>Model Fitting</strong>
+<ul>
+<li>We fit three LightGBM quantile regression models, targeting the 10th, 50th, and 90th percentiles of NPP.</li>
+<li>Models are trained using <code>furrr::future_map()</code> in parallel (multisession) to speed up computation.</li>
+</ul></li>
+<li><strong>Prediction</strong>
+<ul>
+<li>We simulate a “pre-European” landscape by assuming:
+<ul>
+<li>No irrigation (<code>mirad_irrlands = 0</code>)</li>
+<li>No recent disturbance (<code>disturbance = 'Non Disturbed'</code>)</li>
+</ul></li>
+<li>We generate predictions for each quantile, back-transform the output with <code>expm1()</code>, and mask predictions to valid elevation areas.</li>
+</ul></li>
+<li><strong>Output</strong>
+<ul>
+<li>Predicted rasters are stacked and written to disk as <code>"data-derived/pre-european_npp_swus.tif"</code>.</li>
+</ul></li>
+<li><strong>Load Results</strong>
+<ul>
+<li>The final raster stack is loaded into the object <code>modeled_production</code> for use in subsequent analysis.</li>
+</ul></li>
+</ol>
+<p>This approach provides a modeled baseline for potential productivity in the absence of modern anthropogenic influences.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1242,86 +1351,27 @@ Figure S2: Percent of years in the maize dry-farming niche across Chacoan region
 <span id="cb12-134"><a href="#cb12-134" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">set.values</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## A function that scales a raster proportional to the mean of an AOI. </span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="do">## The mean of the AOI will be 1.</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>calculate_relative_raster <span class="ot">&lt;-</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(x, aoi){</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    x <span class="sc">%&gt;%</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      terra<span class="sc">::</span><span class="fu">extract</span>(</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        aoi,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun =</span> mean,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">touches =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ID =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>      purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="at">.y =</span> <span class="fu">as.list</span>(x),</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                  \(aoi, rast){</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                    (rast <span class="sc">/</span> aoi)</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                  }</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">%&gt;%</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>      terra<span class="sc">::</span><span class="fu">rast</span>()</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>niche_npp_periods <span class="ot">&lt;-</span> </span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  niche_periods <span class="sc">*</span> modeled_production<span class="sc">$</span><span class="st">`</span><span class="at">50%</span><span class="st">`</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>relative_production <span class="ot">&lt;-</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  niche_npp_periods <span class="sc">%&gt;%</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate_relative_raster</span>(</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">aoi =</span> chaco_regions <span class="sc">%&gt;%</span></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(region <span class="sc">==</span> <span class="st">"VEPIIN (850–1300)"</span>))</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>relative_production_regions <span class="ot">&lt;-</span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  chaco_regions <span class="sc">%&gt;%</span></span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    relative_production <span class="sc">%&gt;%</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  {</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">region =</span> <span class="fu">names</span>(.),</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">relative_productivity =</span> terra<span class="sc">::</span><span class="fu">as.list</span>(.)</span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">relative_productivity =</span> </span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>                    terra<span class="sc">::</span><span class="fu">extract</span>(</span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>                      relative_productivity,</span>
-<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>                      sf<span class="sc">::</span><span class="fu">st_as_sf</span>(geometry),</span>
-<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>                      <span class="at">fun =</span> mean,</span>
-<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>                      <span class="at">na.rm =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>                      <span class="at">touches =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>                      <span class="at">ID =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>()</span>
-<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_drop_geometry</span>() <span class="sc">%T&gt;%</span></span>
-<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_excel_csv</span>(<span class="fu">paste0</span>(<span class="st">"data-derived/relative_productivity_"</span>, gdd_threshold, <span class="st">".csv"</span>))</span>
-<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Joining with `by = join_by(region)`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_map_array</span>(</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"data-derived/pre-european_npp_swus.tif"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">crop</span>(chaco_basin,</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">touches =</span> <span class="cn">FALSE</span>), </span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">12000</span>), </span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Net Primary Productivity (kg C/ m²)"</span>,</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> \(x){x <span class="sc">*</span> <span class="fl">0.0001</span>},</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">facet =</span> <span class="cn">FALSE</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%T&gt;%</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggsave</span>(<span class="at">plot =</span> .,</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="st">"figures/Figure_s3.png"</span>,</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">device =</span> ragg<span class="sc">::</span>agg_png,</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">width =</span> fig_width, </span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> fig_height,</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">bg =</span> <span class="st">"white"</span>,</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">dpi =</span> <span class="dv">600</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_map_array</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"data-derived/pre-european_npp_swus.tif"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">crop</span>(chaco_basin,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">touches =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">12000</span>), </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Net Primary Productivity (kg C/ m²)"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> \(x){x <span class="sc">*</span> <span class="fl">0.0001</span>},</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">facet =</span> <span class="cn">FALSE</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%T&gt;%</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggsave</span>(<span class="at">plot =</span> .,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="st">"figures/Figure_s3.png"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">device =</span> ragg<span class="sc">::</span>agg_png,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">width =</span> fig_width, </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> fig_height,</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">bg =</span> <span class="st">"white"</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">dpi =</span> <span class="dv">600</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="suppfig-s3" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-suppfig figure">
@@ -1341,6 +1391,95 @@ Figure S3: Estimated pre-European Net Primary Productivity (NPP) across the U.S.
 </figcaption>
 </figure>
 </div>
+</section>
+<section id="calculating-relative-maize-productivity-by-region" class="level3">
+<h3 class="anchored" data-anchor-id="calculating-relative-maize-productivity-by-region">Calculating Relative Maize Productivity by Region</h3>
+<p>This code estimates <strong>relative maize productivity</strong> by archaeological region and period, scaling modeled productivity values by the mean within a reference region (VEPIIN, 850–1300 CE). This enables cross-regional comparison of potential maize farming success.</p>
+<ol type="1">
+<li><strong>Define a Scaling Function</strong>
+<ul>
+<li><code>calculate_relative_raster()</code> divides each cell in a raster (or raster stack) by the mean value within a given area of interest (AOI), so that the AOI’s mean becomes 1.</li>
+<li>This normalizes productivity values relative to a baseline region.</li>
+</ul></li>
+<li><strong>Estimate Period-Specific Productivity</strong>
+<ul>
+<li>We multiply the maize niche mask for each period (<code>niche_periods</code>) by the median modeled pre-European NPP (<code>modeled_production$"50%"</code>) to calculate potential maize productivity for each period.</li>
+</ul></li>
+<li><strong>Normalize to VEPIIN</strong>
+<ul>
+<li>We apply the scaling function to the productivity rasters using VEPIIN (850–1300 CE) as the reference AOI.</li>
+<li>This produces <code>relative_production</code>, a raster stack where all values are scaled so that VEPIIN’s mean is 1.</li>
+</ul></li>
+<li><strong>Summarize by Region</strong>
+<ul>
+<li>For each region in <code>chaco_regions</code>, we extract the mean relative productivity.</li>
+<li>The result is a region-wise summary table with scaled productivity values for each period.</li>
+</ul></li>
+<li><strong>Export Output</strong>
+<ul>
+<li>The final table, <code>relative_production_regions</code>, is written to CSV as <code>data-derived/relative_productivity_&lt;PPT_THRESHOLD&gt;.csv</code>.</li>
+</ul></li>
+</ol>
+<p>This analysis helps contextualize agricultural potential across different regions by expressing it relative to a well-studied reference area.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## A function that scales a raster proportional to the mean of an AOI. </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="do">## The mean of the AOI will be 1.</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>calculate_relative_raster <span class="ot">&lt;-</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(x, aoi){</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    x <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      terra<span class="sc">::</span><span class="fu">extract</span>(</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        aoi,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun =</span> mean,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">touches =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ID =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>      purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="at">.y =</span> <span class="fu">as.list</span>(x),</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                  \(aoi, rast){</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                    (rast <span class="sc">/</span> aoi)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                  }</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>      terra<span class="sc">::</span><span class="fu">rast</span>()</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>niche_npp_periods <span class="ot">&lt;-</span> </span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  niche_periods <span class="sc">*</span> modeled_production<span class="sc">$</span><span class="st">`</span><span class="at">50%</span><span class="st">`</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>relative_production <span class="ot">&lt;-</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  niche_npp_periods <span class="sc">%&gt;%</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate_relative_raster</span>(</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">aoi =</span> chaco_regions <span class="sc">%&gt;%</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(region <span class="sc">==</span> <span class="st">"VEPIIN (850–1300)"</span>))</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>relative_production_regions <span class="ot">&lt;-</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  chaco_regions <span class="sc">%&gt;%</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    relative_production <span class="sc">%&gt;%</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">region =</span> <span class="fu">names</span>(.),</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">relative_productivity =</span> terra<span class="sc">::</span><span class="fu">as.list</span>(.)</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">relative_productivity =</span> </span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>                    terra<span class="sc">::</span><span class="fu">extract</span>(</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>                      relative_productivity,</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>                      sf<span class="sc">::</span><span class="fu">st_as_sf</span>(geometry),</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>                      <span class="at">fun =</span> mean,</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>                      <span class="at">na.rm =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>                      <span class="at">touches =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>                      <span class="at">ID =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>()</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_drop_geometry</span>() <span class="sc">%T&gt;%</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_excel_csv</span>(<span class="fu">paste0</span>(<span class="st">"data-derived/relative_productivity_"</span>, ppt_threshold, <span class="st">".csv"</span>))</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Joining with `by = join_by(region)`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -1358,7 +1497,7 @@ Figure S3: Estimated pre-European Net Primary Productivity (NPP) across the U.S.
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> \(x){x <span class="sc">*</span> <span class="fl">0.0001</span>}</span>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%T&gt;%</span></span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggsave</span>(<span class="at">plot =</span> .,</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"figures/Figure_s4_"</span>, gdd_threshold, <span class="st">".png"</span>),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"figures/Figure_s4_"</span>, ppt_threshold, <span class="st">".png"</span>),</span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">device =</span> ragg<span class="sc">::</span>agg_png,</span>
 <span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">width =</span> fig_width, </span>
 <span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> fig_height,</span>
@@ -1400,7 +1539,7 @@ Figure S4: Niche-attenuated Net Primary Productivity (NPP) during key cultural p
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> scales<span class="sc">::</span>percent</span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%T&gt;%</span></span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggsave</span>(<span class="at">plot =</span> .,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"figures/Figure_s5_"</span>, gdd_threshold, <span class="st">".png"</span>),</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"figures/Figure_s5_"</span>, ppt_threshold, <span class="st">".png"</span>),</span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">device =</span> ragg<span class="sc">::</span>agg_png,</span>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">width =</span> fig_width, </span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> fig_height,</span>
@@ -1426,6 +1565,7 @@ Figure S5: Relative productivity across Chacoan regions during key cultural peri
 </figcaption>
 </figure>
 </div>
+<p>Finally, we bring all of the details together to calculate the statistics and demographic estimates presented in Table 2. See <a href="tables/Table_2_250.xlsx"><code>tables/Table_2_250.xlsx</code></a> for output.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1638,12 +1778,62 @@ Figure S5: Relative productivity across Chacoan regions during key cultural peri
 <span id="cb17-207"><a href="#cb17-207" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Chaco Regional System</span><span class="st">`</span> <span class="ot">=</span> crs_population_final</span>
 <span id="cb17-208"><a href="#cb17-208" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb17-209"><a href="#cb17-209" aria-hidden="true" tabindex="-1"></a>    openxlsx<span class="sc">::</span><span class="fu">write.xlsx</span>(</span>
-<span id="cb17-210"><a href="#cb17-210" aria-hidden="true" tabindex="-1"></a>      <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">"tables/Table_2_"</span>, gdd_threshold, <span class="st">".xlsx"</span>),</span>
+<span id="cb17-210"><a href="#cb17-210" aria-hidden="true" tabindex="-1"></a>      <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">"tables/Table_2_"</span>, ppt_threshold, <span class="st">".xlsx"</span>),</span>
 <span id="cb17-211"><a href="#cb17-211" aria-hidden="true" tabindex="-1"></a>      <span class="at">asTable =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb17-212"><a href="#cb17-212" aria-hidden="true" tabindex="-1"></a>      <span class="at">colWidths =</span> <span class="st">"auto"</span></span>
 <span id="cb17-213"><a href="#cb17-213" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<details>
+<summary>
+Session Info
+</summary>
+<div class="cell" data-layout-align="center">
+<pre><code>#&gt; ─ Session info ───────────────────────────────────────────────────────────────
+#&gt;  setting  value
+#&gt;  version  R version 4.5.1 (2025-06-13)
+#&gt;  os       macOS Sequoia 15.5
+#&gt;  system   aarch64, darwin20
+#&gt;  ui       X11
+#&gt;  language (EN)
+#&gt;  collate  en_US.UTF-8
+#&gt;  ctype    en_US.UTF-8
+#&gt;  tz       America/Denver
+#&gt;  date     2025-07-10
+#&gt;  pandoc   3.7.0.2 @ /opt/homebrew/bin/ (via rmarkdown)
+#&gt;  quarto   1.7.32 @ /usr/local/bin/quarto
+#&gt; 
+#&gt; ─ Packages ───────────────────────────────────────────────────────────────────
+#&gt;  package   * version date (UTC) lib source
+#&gt;  dplyr     * 1.1.4   2023-11-17 [1] CRAN (R 4.5.0)
+#&gt;  forcats   * 1.0.0   2023-01-29 [1] CRAN (R 4.5.0)
+#&gt;  furrr     * 0.3.1   2022-08-15 [1] CRAN (R 4.5.0)
+#&gt;  future    * 1.58.0  2025-06-05 [1] CRAN (R 4.5.0)
+#&gt;  ggplot2   * 3.5.2   2025-04-09 [1] CRAN (R 4.5.0)
+#&gt;  lightgbm  * 4.6.0   2025-02-13 [1] CRAN (R 4.5.0)
+#&gt;  lubridate * 1.9.4   2024-12-08 [1] CRAN (R 4.5.0)
+#&gt;  magrittr  * 2.0.3   2022-03-30 [1] CRAN (R 4.5.0)
+#&gt;  openxlsx  * 4.2.8   2025-01-25 [1] CRAN (R 4.5.0)
+#&gt;  pak       * 0.9.0   2025-05-27 [1] CRAN (R 4.5.0)
+#&gt;  purrr     * 1.0.4   2025-02-05 [1] CRAN (R 4.5.0)
+#&gt;  readr     * 2.1.5   2024-01-10 [1] CRAN (R 4.5.0)
+#&gt;  sbtools   * 1.4.0   2025-07-07 [1] CRAN (R 4.5.0)
+#&gt;  sf        * 1.0-21  2025-05-15 [1] CRAN (R 4.5.0)
+#&gt;  slider    * 0.3.2   2024-10-25 [1] CRAN (R 4.5.0)
+#&gt;  stringr   * 1.5.1   2023-11-14 [1] CRAN (R 4.5.0)
+#&gt;  terra     * 1.8-54  2025-06-01 [1] CRAN (R 4.5.0)
+#&gt;  tibble    * 3.3.0   2025-06-08 [1] CRAN (R 4.5.0)
+#&gt;  tidyr     * 1.3.1   2024-01-24 [1] CRAN (R 4.5.0)
+#&gt;  tidyterra * 0.7.2   2025-04-14 [1] CRAN (R 4.5.0)
+#&gt;  tidyverse * 2.0.0   2023-02-22 [1] CRAN (R 4.5.0)
+#&gt; 
+#&gt;  [1] /Users/kyle.bocinsky/Library/R/arm64/4.5/library
+#&gt;  [2] /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library
+#&gt;  * ── Packages attached to the search path.
+#&gt; 
+#&gt; ──────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</details></section>
 </section>
 
 </main>

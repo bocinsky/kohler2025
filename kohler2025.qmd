@@ -4,6 +4,7 @@ format:
     toc: true
     code-fold: true
     df-print: paged
+    output-file: "index"
 crossref:
   custom:
     - kind: float
@@ -21,7 +22,7 @@ crossref:
 
 fig_width = 10
 fig_height = 4
-gdd_threshold = 250
+ppt_threshold = 250
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -57,7 +58,8 @@ pak::pak(c("magrittr",
            "slider",
            "lightgbm",
            "furrr",
-           "ragg"))
+           "ragg",
+           "sessioninfo"))
 
 library(magrittr)
 library(tidyverse)
@@ -196,6 +198,8 @@ chaco_regions %>%
 
 ```
 
+::: {#fig-1}
+
 ```{r fig-map-regions}
 
 mapview::mapview(chaco_regions,
@@ -206,6 +210,10 @@ mapview::mapview(chaco_regions,
                  layer.name = "Region")
 
 ```
+
+**Extent of the Chaco Regional System during the Early CRS (AD 850-1039), Late CRS (1040-1149), and Post-CRS (1150-1300), with the VEPIIN area.** Extrema identified for the Early and Late CRS. This map in the main manuscript was made in QGIS by Laura Brumbaugh.
+
+:::
 
 ```{r plot-map-array}
 # Get state boundaries from the US Census for mapping
@@ -289,16 +297,16 @@ plot_map_array <-
 
 ```
 
-
-
 ## Dryland Maize Farming Niche
+
+Here, we derive a dryland maize farming niche from paleoclimate reconstructions provided by the *Synthesizing Knowledge of Past Environments (SKOPE)* project. This code computes the Maize Farming Niche (MFN) for the U.S. Southwest by combining gridded paleoclimate reconstructions of precipitation and growing degree days (GDD), which we download from Amazon S3. We begin by defining output file paths and retrieving the relevant PaleoCAR raster data. We then generate a binary raster indicating areas suitable for maize cultivation—those where both precipitation and GDD exceed specified thresholds (e.g., GDD > 1000). If this MFN raster does not already exist, we compute it and save it to disk. Next, we extract mean and standard deviation MFN values for each region in chaco_regions, summarizing the results in an Excel spreadsheet. Finally, we compute average MFN conditions for key archaeological periods (Early, Late, Post-Chaco, and VEPIIN) by averaging the relevant yearly layers in the raster stack.
 
 ```{r paleocar-extraction}
 mfn_path <- file.path("data-derived",
-                      paste0("maize_farming_niche_",gdd_threshold,".xlsx"))
+                      paste0("maize_farming_niche_",ppt_threshold,".xlsx"))
 
 mfn_rast_path <-
-  paste0("data-raw/maize_farming_niche_swus_paleocar_",gdd_threshold,".tif")
+  paste0("data-raw/maize_farming_niche_swus_paleocar_",ppt_threshold,".tif")
 
 ## Download PaleoCAR Maize niche data from Amazon S3.
 mfn_sources <-
@@ -323,7 +331,7 @@ if(!file.exists(mfn_rast_path)){
   ppt_niche <-
     terra::rast(mfn_sources$ppt) %T>%
     terra::set.values() %>%
-    magrittr::is_weakly_greater_than(gdd_threshold)
+    magrittr::is_weakly_greater_than(ppt_threshold)
   
   gdd_niche <-
     terra::rast(mfn_sources$gdd) %T>%
@@ -406,6 +414,8 @@ niche_periods <-
   terra::rast()
 
 ```
+
+Here, we implement a sliding linear regressions smoothing model on the maize farming niche, and plot the resulting figure.
 
 ::: {#fig-2}
 
@@ -493,7 +503,7 @@ sliding_lm %>%
     values = chaco_region_colors) +
   theme_minimal()
 
-ggsave(paste0("figures/Figure_2_", gdd_threshold, ".png"), 
+ggsave(paste0("figures/Figure_2_", ppt_threshold, ".png"), 
        device = ragg::agg_png, 
        width = fig_width, 
        height = fig_height,
@@ -503,9 +513,11 @@ ggsave(paste0("figures/Figure_2_", gdd_threshold, ".png"),
 
 ```
 
-Average proportion of cells within the maize dry-farming niche through time for the four regions outlined in Figure 1. E CRS (etc.) indicates Early Chaco Regional System. The proportion of cells in the dry-farming niche is determined by tree-ring-based estimates of temperature and precipitation (Bocinsky and Kohler 2014). Cells with precipitation >= 300mm and Growing Degree Days >= 1000 are deemed within the niche. The point estimate plotted for each year is based on a linear regression of year on maize-niche proportion, using a moving window containing the previous 10 years. For example, the value plotted for AD 900 is the linear prediction using niche proportions from AD 890 to 899. The standard error for each regression is used to calculate 80% CIs around the point estimates, shown by the shaded areas. A simpler view of these data, by decadal means, is presented in Figure S1.
+Average proportion of cells within the maize dry-farming niche through time for the four regions outlined in Figure 1. E CRS (etc.) indicates Early Chaco Regional System. The proportion of cells in the dry-farming niche is determined by tree-ring-based estimates of temperature and precipitation (Bocinsky and Kohler 2014). Cells with precipitation >= 250mm and Growing Degree Days >= 1000 are deemed within the niche. The point estimate plotted for each year is based on a linear regression of year on maize-niche proportion, using a moving window containing the previous 10 years. For example, the value plotted for AD 900 is the linear prediction using niche proportions from AD 890 to 899. The standard error for each regression is used to calculate 80% CIs around the point estimates, shown by the shaded areas. A simpler view of these data, by decadal means, is presented in Figure S1.
 
 :::
+
+In @suppfig-s1, we present a simplified version of @fig-2 using decadal means, as calculated here.
 
 ::: {#suppfig-s1}
 
@@ -581,7 +593,7 @@ hopping_mean %>%
     values = chaco_region_colors) +
   theme_minimal()
 
-ggsave(paste0("figures/Figure_s1_", gdd_threshold, ".png"), 
+ggsave(paste0("figures/Figure_s1_", ppt_threshold, ".png"), 
        device = ragg::agg_png, 
        width = fig_width, 
        height = fig_height,
@@ -595,6 +607,7 @@ Average proportion of cells within the maize dry-farming niche by decade for the
 
 :::
 
+The Maize Farming Niche may be visualized as the proportion of years within a given period that meet the niche thresholds (here, 250 mm of water year precipitation and 1000 growing degree days).
 
 ::: {#suppfig-s2}
 
@@ -613,7 +626,7 @@ Average proportion of cells within the maize dry-farming niche by decade for the
   ) 
 ) %T>%
   ggsave(plot = .,
-         filename = paste0("figures/Figure_s2_", gdd_threshold, ".png"),
+         filename = paste0("figures/Figure_s2_", ppt_threshold, ".png"),
          device = ragg::agg_png,
          width = fig_width, 
          height = fig_height,
@@ -630,6 +643,41 @@ Percent of years in the maize dry-farming niche across Chacoan regions during ke
 ## Modeling pre-European Net Primary Productivity
 
 To model pre-European Net Primary Productivity (NPP), we estimated potential landscape productivity in the absence of modern irrigation and disturbance, establishing a baseline for past agricultural suitability. We used MODIS 250m annual NPP data for the years 2002, 2007, 2012, and 2017 (Rollins 2009), along with MIRAD irrigated lands data (Pervez and Brown 2010), Landfire datasets (Biophysical Settings, Existing Vegetation Types, Historical Disturbance; (Nelson et al. 2013; Rollins 2009), and PRISM 800m elevation data. We reprojected and aligned all datasets to a common spatial template based on the 800m PRISM dataset. For model training, we retained irrigated and disturbed pixels, but we excluded them during prediction to simulate pre-European conditions.
+
+This section of the code prepares the environmental raster datasets at a common resolution and extent. Specifically, we resample, reclassify, and align data on productivity, irrigation, vegetation, disturbance, and elevation to a shared spatial template.
+
+### Data preparation
+
+#### 1. Establish a Template Raster
+
+We create a single-layer raster template based on the Maize Farming Niche data to use as a consistent spatial reference for projection and alignment.
+
+#### 2. MODIS Net Primary Productivity (NPP)
+
+- We download 250-meter MODIS NPP rasters for selected years (2002, 2007, 2012, 2017) from the [Numerical Terradynamic Simulation Group (NTSG)](http://files.ntsg.umt.edu/data/NTSG_Products/MOD17/).
+- We extract the `annualNPP` layer, project it to the template grid using bilinear interpolation, and save the output as a compressed raster stack.
+
+#### 3. Irrigated Lands (MIRAD)
+
+- We query and download MIRAD-derived irrigated lands data from the USGS ScienceBase repository ([DOI:10.5066/P9NA3EO8](https://doi.org/10.5066/P9NA3EO8)).
+- We load the relevant 250m rasters, project them to our template using `max` resampling (preserving irrigated presence), and save the result as a binary raster.
+
+#### 4. LANDFIRE Vegetation and Disturbance Layers
+
+- We download three datasets from LANDFIRE:
+  - **Biophysical Settings (BPS)**: [LF2020 BPS](https://www.landfire.gov/data-downloads/US_220/LF2020_BPS_220_CONUS.zip)
+  - **Historical Disturbance (HDist)**: [LF2023 HDist](https://www.landfire.gov/data-downloads/US_Disturbance/LF2023_HDist_240_CONUS.zip)
+  - **Existing Vegetation Types (EVT)**: [LF2023 EVT](https://www.landfire.gov/data-downloads/US_240/LF2023_EVT_240_CONUS.zip)
+- For each dataset:
+  - We unzip the file, extract the raster and its corresponding classification CSV.
+  - We project it to our template using `mode` resampling (preserving dominant class).
+  - We recategorize factor levels to consolidate similar vegetation types or correct naming inconsistencies.
+- We then assemble the BPS, EVT, and HDist layers into a single multi-layer raster object.
+
+#### 5. PRISM Elevation
+
+- We download the 800-meter DEM from the [PRISM Climate Group](https://prism.oregonstate.edu) via a virtual file system call (`/vsicurl`).
+- We crop it to the template extent and save the result for elevation analysis.
 
 ```{r npp-data}
 template <- 
@@ -1051,7 +1099,41 @@ elev <-
 
 ```
 
-We trained LightGBM (Ke et al. 2017) quantile regression models to predict log-transformed NPP at the 10th, 50th, and 90th percentiles. Our models treated EVT, disturbance type, and irrigated lands as categorical predictors and elevation, latitude, and longitude as continuous predictors. After training, we used these models to generate NPP predictions across the study area under a no-irrigation, no-disturbance scenario. We visualized the resulting median (50%) NPP map as a baseline productivity surface (Fig. S2). We then multiplied this surface by the proportion of years meeting Maize Farming Niche (MFN) thresholds to generate maps of “niche-attenuated NPP” (Fig. S3). Finally, we normalized these values relative to the central Mesa Verde region to estimate relative productivity maps (Fig. S4) that highlight agricultural potential across the Chaco Basin.
+We trained LightGBM (Ke et al. 2017) quantile regression models to predict log-transformed NPP at the 10th, 50th, and 90th percentiles. Our models treated EVT, disturbance type, and irrigated lands as categorical predictors and elevation, latitude, and longitude as continuous predictors. After training, we used these models to generate NPP predictions across the study area under a no-irrigation, no-disturbance scenario. We visualized the resulting median (50%) NPP map as a baseline productivity surface (@suppfig-s3). We then multiplied this surface by the proportion of years meeting Maize Farming Niche (MFN) thresholds to generate maps of “niche-attenuated NPP” (@suppfig-s4). Finally, we normalized these values relative to the central Mesa Verde region to estimate relative productivity maps (@suppfig-s5) that highlight agricultural potential across the Chaco Basin.
+
+### Estimating Pre-European Net Primary Productivity (NPP) Using Gradient Boosted Models
+
+This code fits a quantile-based LightGBM (Gradient Boosted Machine) model to estimate **pre-European NPP** based on landscape characteristics in the U.S. Southwest. The process includes the following steps:
+
+1. **Data Assembly**
+   - We construct a spatial dataset (`landscape_data`) by combining:
+     - LANDFIRE Biophysical Settings (BPS), Existing Vegetation Types (EVT), and Disturbance data
+     - PRISM elevation
+     - MODIS-derived NPP (for years 2002, 2007, 2012, 2017)
+     - MIRAD irrigated lands
+   - Data are merged by year and converted to tidy, long format.
+
+2. **Training Data Preparation**
+   - We convert categorical predictors to integers, remove missing values, and drop unused fields (e.g., year, BPS).
+   - The response variable is the natural log of NPP plus one (`log1p(NPP)`), which helps handle skewed data.
+
+3. **Model Fitting**
+   - We fit three LightGBM quantile regression models, targeting the 10th, 50th, and 90th percentiles of NPP.
+   - Models are trained using `furrr::future_map()` in parallel (multisession) to speed up computation.
+
+4. **Prediction**
+   - We simulate a "pre-European" landscape by assuming:
+     - No irrigation (`mirad_irrlands = 0`)
+     - No recent disturbance (`disturbance = 'Non Disturbed'`)
+   - We generate predictions for each quantile, back-transform the output with `expm1()`, and mask predictions to valid elevation areas.
+
+5. **Output**
+   - Predicted rasters are stacked and written to disk as `"data-derived/pre-european_npp_swus.tif"`.
+
+6. **Load Results**
+   - The final raster stack is loaded into the object `modeled_production` for use in subsequent analysis.
+
+This approach provides a modeled baseline for potential productivity in the absence of modern anthropogenic influences.
 
 ```{r lightgbm}
 ## Fit a GBM model to estimate NPP from Biophysical Setting
@@ -1191,6 +1273,59 @@ modeled_production <-
 
 ```
 
+::: {#suppfig-s3}
+
+```{r Figure_s3}
+
+plot_map_array(
+  x = terra::rast("data-derived/pre-european_npp_swus.tif") %>%
+    terra::crop(chaco_basin,
+                touches = FALSE), 
+  
+  limits = c(0,12000), 
+  name = "\nNet Primary Productivity (kg C/ m²)",
+  labels = \(x){x * 0.0001},
+  facet = FALSE
+) %T>%
+  ggsave(plot = .,
+         filename = "figures/Figure_s3.png",
+         device = ragg::agg_png,
+         width = fig_width, 
+         height = fig_height,
+         bg = "white",
+         dpi = 600
+  )
+
+```
+
+Estimated pre-European Net Primary Productivity (NPP) across the U.S. Southwest. We used LightGBM quantile regression to model 10th, 50th (median), and 90th percentile NPP under pre-European conditions—excluding modern irrigation and recent disturbances—based on MODIS NPP data, elevation, and land cover characteristics. The resulting maps provide a baseline of landscape productivity in kg C/m².
+
+:::
+
+### Calculating Relative Maize Productivity by Region
+
+This code estimates **relative maize productivity** by archaeological region and period, scaling modeled productivity values by the mean within a reference region (VEPIIN, 850–1300 CE). This enables cross-regional comparison of potential maize farming success.
+
+1. **Define a Scaling Function**
+   - `calculate_relative_raster()` divides each cell in a raster (or raster stack) by the mean value within a given area of interest (AOI), so that the AOI's mean becomes 1.
+   - This normalizes productivity values relative to a baseline region.
+
+2. **Estimate Period-Specific Productivity**
+   - We multiply the maize niche mask for each period (`niche_periods`) by the median modeled pre-European NPP (`modeled_production$"50%"`) to calculate potential maize productivity for each period.
+
+3. **Normalize to VEPIIN**
+   - We apply the scaling function to the productivity rasters using VEPIIN (850–1300 CE) as the reference AOI.
+   - This produces `relative_production`, a raster stack where all values are scaled so that VEPIIN's mean is 1.
+
+4. **Summarize by Region**
+   - For each region in `chaco_regions`, we extract the mean relative productivity.
+   - The result is a region-wise summary table with scaled productivity values for each period.
+
+5. **Export Output**
+   - The final table, `relative_production_regions`, is written to CSV as `data-derived/relative_productivity_<PPT_THRESHOLD>.csv`.
+
+This analysis helps contextualize agricultural potential across different regions by expressing it relative to a well-studied reference area.
+
 ```{r relative-productivity}
 ## A function that scales a raster proportional to the mean of an AOI. 
 ## The mean of the AOI will be 1.
@@ -1244,39 +1379,10 @@ relative_production_regions <-
   ) %>%
   dplyr::ungroup() %>%
   sf::st_drop_geometry() %T>%
-  readr::write_excel_csv(paste0("data-derived/relative_productivity_", gdd_threshold, ".csv"))
+  readr::write_excel_csv(paste0("data-derived/relative_productivity_", ppt_threshold, ".csv"))
 
 
 ```
-
-::: {#suppfig-s3}
-
-```{r Figure_s3}
-
-plot_map_array(
-  x = terra::rast("data-derived/pre-european_npp_swus.tif") %>%
-    terra::crop(chaco_basin,
-                touches = FALSE), 
-  
-  limits = c(0,12000), 
-  name = "\nNet Primary Productivity (kg C/ m²)",
-  labels = \(x){x * 0.0001},
-  facet = FALSE
-) %T>%
-  ggsave(plot = .,
-         filename = "figures/Figure_s3.png",
-         device = ragg::agg_png,
-         width = fig_width, 
-         height = fig_height,
-         bg = "white",
-         dpi = 600
-  )
-
-```
-
-Estimated pre-European Net Primary Productivity (NPP) across the U.S. Southwest. We used LightGBM quantile regression to model 10th, 50th (median), and 90th percentile NPP under pre-European conditions—excluding modern irrigation and recent disturbances—based on MODIS NPP data, elevation, and land cover characteristics. The resulting maps provide a baseline of landscape productivity in kg C/m².
-
-:::
 
 ::: {#suppfig-s4}
 
@@ -1296,7 +1402,7 @@ plot_map_array(
   labels = \(x){x * 0.0001}
 ) %T>%
   ggsave(plot = .,
-         filename = paste0("figures/Figure_s4_", gdd_threshold, ".png"),
+         filename = paste0("figures/Figure_s4_", ppt_threshold, ".png"),
          device = ragg::agg_png,
          width = fig_width, 
          height = fig_height,
@@ -1327,7 +1433,7 @@ plot_map_array(
   labels = scales::percent
 ) %T>%
   ggsave(plot = .,
-         filename = paste0("figures/Figure_s5_", gdd_threshold, ".png"),
+         filename = paste0("figures/Figure_s5_", ppt_threshold, ".png"),
          device = ragg::agg_png,
          width = fig_width, 
          height = fig_height,
@@ -1341,7 +1447,7 @@ Relative productivity across Chacoan regions during key cultural periods. We sca
 
 :::
 
-
+Finally, we bring all of the details together to calculate the statistics and demographic estimates presented in Table 2. See [`tables/Table_2_250.xlsx`](tables/Table_2_250.xlsx) for output.
 
 ```{r tab-2}
 vepiin_area <-
@@ -1547,13 +1653,29 @@ list(
   `Chaco Regional System` = crs_population_final
 ) %>%
     openxlsx::write.xlsx(
-      file = paste0("tables/Table_2_", gdd_threshold, ".xlsx"),
+      file = paste0("tables/Table_2_", ppt_threshold, ".xlsx"),
       asTable = TRUE,
       colWidths = "auto"
     )
 
 ```
 
+<details><summary>Session Info</summary>
+```{r, echo = FALSE}
+# save the session info as an object
+pkg_sesh <- sessioninfo::session_info(pkgs = "attached")
+# get the quarto version
+quarto_version <- system("quarto --version", intern = TRUE)
+# inject the quarto info
+pkg_sesh$platform$quarto <- paste(
+  system("quarto --version", intern = TRUE),
+  "@",
+  quarto::quarto_path()
+)
+# print it out
+pkg_sesh
+
+```
 
 
 
