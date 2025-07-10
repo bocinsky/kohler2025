@@ -15,9 +15,19 @@ crossref:
       latex-list-of-description: Supplementary Figure
 ---
 
+# Research compendium for Kohler, Brumbaugh, and Bocinsky (2025)
+
 This R-based research compendium supports an analysis of climate variability and its impact on ancestral Pueblo demography in the Chaco Regional System. It draws on high-resolution paleoclimate reconstructions and spatial regional boundaries to estimate the frequency and duration of agricultural potential over time, and their relationship to the demography of the region.
 
 View the raw source code and output at: [https://github.com/bocinsky/kohler2025](https://github.com/bocinsky/kohler2025)
+
+#### Citation
+
+**When using the code included in this research compendium, please cite *all* of the following:**
+
+> Kohler, Timothy A., Laura E. Brumbaugh, and R. Kyle Bocinsky. How Many People lived in the Chaco Regional System, and Why It Matters. KIVA, In review.
+
+> Kohler, Timothy A., Laura E. Brumbaugh, and R. Kyle Bocinsky. Research compendium for: *How Many People lived in the Chaco Regional System, and Why It Matters*, 2025. Version 1.0.0. Zenodo. [DOI]
 
 ```{r setup}
 #| echo: false
