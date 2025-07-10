@@ -202,7 +202,9 @@ chaco_region_colors <-
       "VEPIIN (850–1300)"
     ))
 
+# Show a table of region areas calculated in NAD83, Zone 12 units (as reported in the paper)
 chaco_regions %>%
+  sf::st_transform(26912) %>%
   dplyr::mutate(Region = region,
                 Area = sf::st_area(geometry) %>%
                   units::set_units("km^2") %>%
